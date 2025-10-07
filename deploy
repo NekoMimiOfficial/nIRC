@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# make sure to install twine and setup ~/.pypirc
+
+twine upload ./dist/*
