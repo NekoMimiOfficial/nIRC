@@ -1,0 +1,13 @@
+log.txt
+.Python
+build/
+dist/
+sdist/
+*.egg-info/
+.venv/
+venv/
+env/
+pycache/
+*.pyc
+*.pyd
+*.pyo

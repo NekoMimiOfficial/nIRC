@@ -1,0 +1,27 @@
+[build-system]
+
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nIRC"
+version = "1.0.0"
+authors = [
+{ name="NekoMimiOfficial", email="nekomimi@tilde.team" },
+]
+description = "an asynchronous IRC bot framework"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+"Programming Language :: Python :: 3",
+"License :: OSI Approved :: MIT License",
+"Operating System :: OS Independent",
+"Topic :: Utilities",
+]
+keywords = ["irc", "python", "library", "asynchronous"]
+
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nIRC*"]
