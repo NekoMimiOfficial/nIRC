@@ -11,23 +11,90 @@
     <meta property="og:description" content="nIRC is a framework made in python that brings you an asynchronous, batteries-included IRC bot library, The framework abstracts raw IRC protocol handling, offering an elegant, decorator-based interface for defining commands and reacting to server events.">
     <title>nIRC Bot Framework Documentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Catppuccin Mocha Palette
+                        'ctp-crust': '#11111b',
+                        'ctp-mantle': '#181825',
+                        'ctp-base': '#1e1e2e',
+                        'ctp-surface0': '#313244',
+                        'ctp-surface1': '#45475a',
+                        'ctp-surface2': '#585b70',
+                        'ctp-overlay0': '#6c7086',
+                        'ctp-overlay1': '#7f849c',
+                        'ctp-overlay2': '#9399b2',
+                        'ctp-subtext0': '#a6adc8',
+                        'ctp-subtext1': '#bac2de',
+                        'ctp-text': '#cdd6f4',
+                        'ctp-rosewater': '#f5e0dc',
+                        'ctp-flamingo': '#f2cdcd',
+                        'ctp-pink': '#f5c2e7',
+                        'ctp-mauve': '#cba6f7',
+                        'ctp-red': '#f38ba8',
+                        'ctp-maroon': '#eba0ac',
+                        'ctp-peach': '#fab387',
+                        'ctp-yellow': '#f9e2af',
+                        'ctp-green': '#a6e3a1',
+                        'ctp-teal': '#94e2d5',
+                        'ctp-sky': '#89dceb',
+                        'ctp-sapphire': '#74c7ce',
+                        'ctp-blue': '#89b4fa',
+                        'ctp-lavender': '#b4befe',
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         .active-nav {
-            color: #0284c7;
+            color: #89b4fa; /* Catppuccin Blue */
             font-weight: 600;
-            border-left-color: #0284c7;
+            border-left-color: #89b4fa; /* Catppuccin Blue */
+        }
+        :root {
+            --md3-surface-container-low: #292c42;
+            --md3-surface-container: #2e3148;
+            --md3-surface-container-t: #2e3148aa;
+            --md3-surface-container-high: #343750;
+            --md3-surface: #202336;
+            --md3-on-surface: #CAD3F5;
+            --md3-on-surface-variant: #B8C0E0;
+            --md3-primary: #8AADF4;
+            --md3-on-primary: #181926;
+            --md3-success: #A6DA95;
+            --md3-error: #ED8796;
+        }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--md3-surface-container);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #484A5B;
+            border-radius: 5px;
+            border: 2px solid var(--md3-surface-container);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--md3-on-surface-variant);
         }
         .nav-link {
             border-left: 2px solid transparent;
             transition: all 0.2s ease-in-out;
         }
         .nav-link:hover {
-            color: #0369a1;
-            border-left-color: #7dd3fc;
+            color: #b4befe; /* Catppuccin Lavender */
+            border-left-color: #89b4fa; /* Catppuccin Blue */
         }
         .code-block {
             position: relative;
@@ -36,64 +103,61 @@
             position: absolute;
             top: 0.75rem;
             right: 0.75rem;
-            background-color: #475569;
-            color: white;
+            background-color: #45475a; /* Catppuccin Surface1 */
+            color: #cdd6f4; /* Catppuccin Text */
             padding: 0.25rem 0.5rem;
             border-radius: 0.375rem;
             font-size: 0.75rem;
             cursor: pointer;
-            opacity: 0.5;
+            opacity: 0.7;
             transition: opacity 0.2s ease-in-out;
-            z-index: 10; /* Ensure button is above code */
+            z-index: 10;
         }
         .code-block:hover .copy-btn {
             opacity: 1;
         }
-
-        /* No custom syntax highlighting classes included, as requested */
-
     </style>
 </head>
-<body class="bg-stone-50 text-stone-800">
+<body class="bg-ctp-crust text-ctp-text">
     <div class="flex flex-col md:flex-row">
-        <aside class="w-full md:w-64 lg:w-72 bg-stone-100 border-r border-stone-200 md:h-screen md:sticky md:top-0 p-6 md:p-8">
+        <aside class="w-full md:w-64 lg:w-72 bg-ctp-mantle border-r border-ctp-surface2 md:h-screen md:sticky md:top-0 p-6 md:p-8">
             <img src="http://nekomimi.tilde.team/res/misc/nIRCBanner.png" style="max-height: 80px;">
-            <h1 class="text-xl font-bold text-stone-900">nIRC Bot Framework</h1>
+            <h1 class="text-xl font-bold text-ctp-text">nIRC Bot Framework</h1>
             <nav id="main-nav" class="mt-8 space-y-2">
-                <a href="#introduction" class="block py-2 px-3 text-stone-600 nav-link">Introduction</a>
-                <a href="#configuration" class="block py-2 px-3 text-stone-600 nav-link">Core Configuration</a>
+                <a href="#introduction" class="block py-2 px-3 text-ctp-subtext0 nav-link">Introduction</a>
+                <a href="#configuration" class="block py-2 px-3 text-ctp-subtext0 nav-link">Core Configuration</a>
                 <div>
-                    <a href="#abstractions" class="block py-2 px-3 text-stone-600 nav-link font-medium">Core Abstractions</a>
-                    <div class="ml-4 mt-2 space-y-2 border-l-2 border-stone-200">
-                        <a href="#bot-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Bot Class</a>
-                        <a href="#dccfile-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">DCCFile Class</a>
-                        <a href="#irc-connection-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">IRCConnection</a>
-                        <a href="#logger-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Logger Class</a>
-                        <a href="#context-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Context Class</a>
-                        <a href="#member-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Member Class</a>
-                        <a href="#channel-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Channel Class</a>
-                        <a href="#task-runner" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Task Runner</a>
+                    <a href="#abstractions" class="block py-2 px-3 text-ctp-subtext0 nav-link font-medium">Core Abstractions</a>
+                    <div class="ml-4 mt-2 space-y-2 border-l-2 border-ctp-surface2">
+                        <a href="#bot-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Bot Class</a>
+                        <a href="#dccfile-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">DCCFile Class</a>
+                        <a href="#irc-connection-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">IRCConnection</a>
+                        <a href="#logger-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Logger Class</a>
+                        <a href="#context-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Context Class</a>
+                        <a href="#member-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Member Class</a>
+                        <a href="#channel-class" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Channel Class</a>
+                        <a href="#task-runner" class="block py-1.5 px-3 text-sm text-ctp-overlay1 nav-link">Task Runner</a>
                     </div>
                 </div>
-                <a href="#example-script" class="block py-2 px-3 text-stone-600 nav-link">Example Script</a>
+                <a href="#example-script" class="block py-2 px-3 text-ctp-subtext0 nav-link">Example Script</a>
             </nav>
         </aside>
 
         <main class="flex-1 p-6 md:p-10 lg:p-12">
             <div class="max-w-4xl mx-auto space-y-16">
                 <section id="introduction">
-                    <h2 class="text-3xl font-bold text-stone-900 border-b pb-4">Framework Documentation</h2>
-                    <p class="mt-6 text-lg text-stone-700">
+                    <h2 class="text-3xl font-bold text-ctp-text border-b border-ctp-surface2 pb-4">Framework Documentation</h2>
+                    <p class="mt-6 text-lg text-ctp-subtext1">
                         This document provides an overview and a functional guide for the nIRC Bot Framework. It is designed for high-performance, non-blocking interaction with IRC servers. The framework abstracts raw IRC protocol handling, offering an elegant, decorator-based interface for defining commands and reacting to server events.
                     </p>
                 </section>
 
                 <section id="configuration">
-                    <h2 class="text-2xl font-bold text-stone-900">Core Configuration</h2>
-                    <p class="mt-4 text-stone-600">The following constants manage the bot's identity and connection parameters. In a production environment, these should be loaded from secure environment variables or a configuration file.</p>
+                    <h2 class="text-2xl font-bold text-ctp-text">Core Configuration</h2>
+                    <p class="mt-4 text-ctp-subtext0">The following constants manage the bot's identity and connection parameters. In a production environment, these should be loaded from secure environment variables or a configuration file.</p>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Constant</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -102,41 +166,41 @@
                                 </tr>
                             </thead>
                             <tbody class="align-baseline">
-                                <tr class="border-b">
-                                    <td class="p-4 font-mono text-sm bg-stone-50">BOT_NICK</td>
+                                <tr class="border-b border-ctp-surface2">
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">BOT_NICK</td>
                                     <td class="p-4 font-mono text-sm">str</td>
-                                    <td class="p-4 text-sm text-stone-600">The nickname the bot will use on the server.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">"ServiceBot"</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">The nickname the bot will use on the server.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">"ServiceBot"</td>
                                 </tr>
-                                <tr class="border-b">
-                                    <td class="p-4 font-mono text-sm bg-stone-50">BOT_USERNAME</td>
+                                <tr class="border-b border-ctp-surface2">
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">BOT_USERNAME</td>
                                     <td class="p-4 font-mono text-sm">str</td>
-                                    <td class="p-4 text-sm text-stone-600">The bot's ident/username.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">"svc_agent"</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">The bot's ident/username.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">"svc_agent"</td>
                                 </tr>
-                                <tr class="border-b">
-                                    <td class="p-4 font-mono text-sm bg-stone-50">BOT_REALNAME</td>
+                                <tr class="border-b border-ctp-surface2">
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">BOT_REALNAME</td>
                                     <td class="p-4 font-mono text-sm">str</td>
-                                    <td class="p-4 text-sm text-stone-600">The bot's "real name" shown in WHOIS.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">"IRC Service Agent v1.0"</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">The bot's "real name" shown in WHOIS.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">"IRC Service Agent v1.0"</td>
                                 </tr>
-                                 <tr class="border-b">
-                                    <td class="p-4 font-mono text-sm bg-stone-50">BOT_PASSWORD</td>
+                                 <tr class="border-b border-ctp-surface2">
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">BOT_PASSWORD</td>
                                     <td class="p-4 font-mono text-sm">Optional[str]</td>
-                                    <td class="p-4 text-sm text-stone-600">Password for NickServ identification. Set to <code>None</code> if not required.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">"MySecurePass"</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">Password for NickServ identification. Set to <code>None</code> if not required.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">"MySecurePass"</td>
                                 </tr>
-                                <tr class="border-b">
-                                    <td class="p-4 font-mono text-sm bg-stone-50">COMMAND_PREFIX</td>
+                                <tr class="border-b border-ctp-surface2">
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">COMMAND_PREFIX</td>
                                     <td class="p-4 font-mono text-sm">str</td>
-                                    <td class="p-4 text-sm text-stone-600">The character(s) used to trigger bot commands.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">"!"</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">The character(s) used to trigger bot commands.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">"!"</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-4 font-mono text-sm bg-stone-50">CHANNELS_TO_JOIN</td>
+                                    <td class="p-4 font-mono text-sm bg-ctp-surface0">CHANNELS_TO_JOIN</td>
                                     <td class="p-4 font-mono text-sm">Dict[str, Optional[str]]</td>
-                                    <td class="p-4 text-sm text-stone-600">Map of channels to join on connection with optional keys.</td>
-                                    <td class="p-4 font-mono text-sm text-sky-700">{"#public": None, "#admin": "key123"}</td>
+                                    <td class="p-4 text-sm text-ctp-subtext0">Map of channels to join on connection with optional keys.</td>
+                                    <td class="p-4 font-mono text-sm text-ctp-blue">{"#public": None, "#admin": "key123"}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -144,18 +208,18 @@
                 </section>
 
                 <section id="abstractions">
-                    <h2 class="text-2xl font-bold text-stone-900">Core Abstractions</h2>
-                    <p class="mt-4 text-stone-600">The framework is built on a few key classes that abstract away the complexity of the IRC protocol, allowing you to focus on building features.</p>
+                    <h2 class="text-2xl font-bold text-ctp-text">Core Abstractions</h2>
+                    <p class="mt-4 text-ctp-subtext0">The framework is built on a few key classes that abstract away the complexity of the IRC protocol, allowing you to focus on building features.</p>
                 </section>
 
                 <section id="bot-class" class="pt-2 -mt-2">
-                     <h3 class="text-xl font-semibold text-stone-800">The <code>Bot</code> Class (The Engine)</h3>
-                     <p class="mt-3 text-stone-600">The main class responsible for managing the connection, registering handlers, dispatching events, and managing background tasks.</p>
+                     <h3 class="text-xl font-semibold text-ctp-text">The <code>Bot</code> Class (The Engine)</h3>
+                     <p class="mt-3 text-ctp-subtext0">The main class responsible for managing the connection, registering handlers, dispatching events, and managing background tasks.</p>
 
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Constructor Arguments (<code>__init__</code>)</h4>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Constructor Arguments (<code>__init__</code>)</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Argument</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -164,21 +228,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">prefix</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The command prefix (e.g., <code>!</code> or <code>.</code>).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">conn</td><td class="p-4 font-mono text-sm">IRCConnection</td><td class="p-4 text-sm text-stone-600">The pre-configured <code>IRCConnection</code> object used for I/O.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">nick</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's primary nickname.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">username</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's username (IDENT).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">realname</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's real name (GECOS).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">password</td><td class="p-4 font-mono text-sm">Optional[str]</td><td class="p-4 text-sm text-stone-600">Password for NickServ identification, if required. (Default: <code>None</code>)</td><td class="p-4 font-mono text-sm text-red-700">No</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">downloads_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Directory for saving files from DCC send requests. (Default: <code>downloads</code>)</td><td class="p-4 font-mono text-sm text-red-700">No</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">prefix</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The command prefix (e.g., <code>!</code> or <code>.</code>).</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">conn</td><td class="p-4 font-mono text-sm">IRCConnection</td><td class="p-4 text-sm text-ctp-subtext0">The pre-configured <code>IRCConnection</code> object used for I/O.</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">nick</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The bot's primary nickname.</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">username</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The bot's username (IDENT).</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">realname</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The bot's real name (GECOS).</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">password</td><td class="p-4 font-mono text-sm">Optional[str]</td><td class="p-4 text-sm text-ctp-subtext0">Password for NickServ identification, if required. (Default: <code>None</code>)</td><td class="p-4 font-mono text-sm text-ctp-red">No</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">downloads_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">Directory for saving files from DCC send requests. (Default: <code>downloads</code>)</td><td class="p-4 font-mono text-sm text-ctp-red">No</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">General Methods</h4>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">General Methods</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method / Property</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -186,17 +250,17 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">start(channel_map)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Establishes the connection, performs initial setup, and enters the main event loop.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">send_message(...)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Sends a raw PRIVMSG to a specified channel or user.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">send_raw(message)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Sends a raw IRC protocol command directly to the server.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">start_task(task_func, *args)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Starts a background task defined with <code>@bot.task</code>.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">start(channel_map)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Establishes the connection, performs initial setup, and enters the main event loop.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send_message(...)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a raw PRIVMSG to a specified channel or user.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send_raw(message)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a raw IRC protocol command directly to the server.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">start_task(task_func, *args)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Starts a background task defined with <code>@bot.task</code>.</td></tr>
                              </tbody>
                         </table>
                     </div>
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Decorators for Event Binding</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Decorators for Event Binding</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Decorator</th>
                                     <th class="p-4 font-semibold text-sm">Contextual Event</th>
@@ -205,29 +269,29 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.command(name)</td><td class="p-4 text-sm">Standard Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds a function to a command triggered via <code>COMMAND_PREFIX</code> (e.g., <code>!help</code>).</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_ready()</td><td class="p-4 text-sm">Connection Ready</td><td class="p-4 font-mono text-sm"><code>Bot</code> instance</td><td class="p-4 text-sm text-stone-600">Fires **once** after successful IRC registration (numeric <code>001</code>/<code>376</code>). Ideal for initialization.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_raw()</td><td class="p-4 text-sm">All Raw Lines</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Fires for every single, unfiltered line received from the IRC server. Use <code>ctx.full_line</code>.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_message()</td><td class="p-4 text-sm">Any Channel Message</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Fires on all <code>PRIVMSG</code> events that are **not** commands. Essential for keyword checks.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_join()</td><td class="p-4 text-sm">User joins channel</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds a function to the JOIN IRC event.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_leave()</td><td class="p-4 text-sm">User parts or quits</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds a function to the PART or QUIT IRC event.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_dcc()</td><td class="p-4 text-sm">DCC File Transfer</td><td class="p-4 font-mono text-sm"><code>DCCFile</code> instance</td><td class="p-4 text-sm text-stone-600">Fires when the bot receives a DCC SEND request and initiates the file transfer process.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">@bot.prefix_command(prefix)</td><td class="p-4 text-sm">Prefixless Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds to a message starting with <code>prefix</code> (e.g., <code>&gt;</code>).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.command(name)</td><td class="p-4 text-sm">Standard Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds a function to a command triggered via <code>COMMAND_PREFIX</code> (e.g., <code>!help</code>).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_ready()</td><td class="p-4 text-sm">Connection Ready</td><td class="p-4 font-mono text-sm"><code>Bot</code> instance</td><td class="p-4 text-sm text-ctp-subtext0">Fires **once** after successful IRC registration (numeric <code>001</code>/<code>376</code>). Ideal for initialization.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_raw()</td><td class="p-4 text-sm">All Raw Lines</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Fires for every single, unfiltered line received from the IRC server. Use <code>ctx.full_line</code>.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_message()</td><td class="p-4 text-sm">Any Channel Message</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Fires on all <code>PRIVMSG</code> events that are **not** commands. Essential for keyword checks.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_join()</td><td class="p-4 text-sm">User joins channel</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds a function to the JOIN IRC event.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_leave()</td><td class="p-4 text-sm">User parts or quits</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds a function to the PART or QUIT IRC event.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_dcc()</td><td class="p-4 text-sm">DCC File Transfer</td><td class="p-4 font-mono text-sm"><code>DCCFile</code> instance</td><td class="p-4 text-sm text-ctp-subtext0">Fires when the bot receives a DCC SEND request and initiates the file transfer process.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">@bot.prefix_command(prefix)</td><td class="p-4 text-sm">Prefixless Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds to a message starting with <code>prefix</code> (e.g., <code>&gt;</code>).</td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="dccfile-class" class="pt-2 -mt-2">
-                    <h3 class="text-xl font-semibold text-stone-800">The <code>DCCFile</code> Class (DCC File Transfer)</h3>
-                    <p class="mt-3 text-stone-600">
+                    <h3 class="text-xl font-semibold text-ctp-text">The <code>DCCFile</code> Class (DCC File Transfer)</h3>
+                    <p class="mt-3 text-ctp-subtext0">
                         This class is passed when the <code>@bot.on_dcc()</code> event fires. It represents an incoming Direct Client-to-Client (DCC) SEND request and provides access to file metadata and transfer progress.
                     </p>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Key Attributes (Metadata and Status)</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Key Attributes (Metadata and Status)</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Attribute</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -235,28 +299,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">context</td><td class="p-4 font-mono text-sm">Context</td><td class="p-4 text-sm text-stone-600">The context object.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The name of the file being sent, as reported in the DCC command.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">extension</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The file extension.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">filesize</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The total expected size of the file in bytes.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">ip_address</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The dotted IPv4 address (e.g., <code>12.34.56.78</code>) of the sending client.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">port</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The port number the sender is listening on for the DCC connection.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">is_done</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-stone-600">Whether the file is done sending.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">is_good</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-stone-600">Whether the file operation completed without errors.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">percent</td><td class="p-4 font-mono text-sm">float</td><td class="p-4 text-sm text-stone-600">The percentage of the operation.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">progress</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The progress in bytes of how much data got transfered.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">sender</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The nickname of the user who initiated the file transfer.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">full_path</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The full local path where the file is being saved.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">safe_filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The filename but with underscores instead of spaces.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">save_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The parent directory to where the file will be saved into.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">context</td><td class="p-4 font-mono text-sm">Context</td><td class="p-4 text-sm text-ctp-subtext0">The context object.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The name of the file being sent, as reported in the DCC command.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">extension</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The file extension.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">filesize</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-ctp-subtext0">The total expected size of the file in bytes.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">ip_address</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The dotted IPv4 address (e.g., <code>12.34.56.78</code>) of the sending client.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">port</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-ctp-subtext0">The port number the sender is listening on for the DCC connection.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">is_done</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-ctp-subtext0">Whether the file is done sending.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">is_good</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-ctp-subtext0">Whether the file operation completed without errors.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">percent</td><td class="p-4 font-mono text-sm">float</td><td class="p-4 text-sm text-ctp-subtext0">The percentage of the operation.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">progress</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-ctp-subtext0">The progress in bytes of how much data got transfered.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">sender</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The nickname of the user who initiated the file transfer.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">full_path</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The full local path where the file is being saved.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">safe_filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The filename but with underscores instead of spaces.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">save_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The parent directory to where the file will be saved into.</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Helper Methods</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Helper Methods</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method / Property</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -265,20 +329,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">start_transfer</td><td class="p-4 font-mono text-sm">property (None)</td><td class="p-4 text-sm text-stone-600">Starts the transfer process and returns a bool depending on whether it failed or succeeded.</td><td class="p-4 font-mono text-sm text-sky-700"><code>dcc_file.start_transfer()</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">start_transfer</td><td class="p-4 font-mono text-sm">property (None)</td><td class="p-4 text-sm text-ctp-subtext0">Starts the transfer process and returns a bool depending on whether it failed or succeeded.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>dcc_file.start_transfer()</code></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="irc-connection-class" class="pt-2 -mt-2">
-                    <h3 class="text-xl font-semibold text-stone-800">The <code>IRCConnection</code> Class (Network I/O)</h3>
-                    <p class="mt-3 text-stone-600">This class manages the asynchronous socket connection, handles raw reading and writing of IRC data, and buffers messages using <code>asyncio</code> streams.</p>
+                    <h3 class="text-xl font-semibold text-ctp-text">The <code>IRCConnection</code> Class (Network I/O)</h3>
+                    <p class="mt-3 text-ctp-subtext0">This class manages the asynchronous socket connection, handles raw reading and writing of IRC data, and buffers messages using <code>asyncio</code> streams.</p>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Constructor Arguments (<code>__init__</code>)</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Constructor Arguments (<code>__init__</code>)</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Argument</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -287,17 +351,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">host</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The IRC server hostname or IP address.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">port</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The IRC server port (usually <code>6667</code>).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">logger</td><td class="p-4 font-mono text-sm">Optional[Logger]</td><td class="p-4 text-sm text-stone-600">A <code>Logger</code> instance for logging network events. If <code>None</code>, a silent logger is used. (Default: <code>None</code>)</td><td class="p-4 font-mono text-sm text-red-700">No</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">host</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The IRC server hostname or IP address.</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">port</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-ctp-subtext0">The IRC server port (usually <code>6667</code>).</td><td class="p-4 font-mono text-sm text-ctp-green">Yes</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">logger</td><td class="p-4 font-mono text-sm">Optional[Logger]</td><td class="p-4 text-sm text-ctp-subtext0">A <code>Logger</code> instance for logging network events. If <code>None</code>, a silent logger is used. (Default: <code>None</code>)</td><td class="p-4 font-mono text-sm text-ctp-red">No</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Key Methods</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Key Methods</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -305,23 +369,23 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">connect()</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Establishes the socket connection to the IRC server.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">send_raw(message)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Sends a raw IRC protocol message line to the server.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">read_line()</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Asynchronously reads a single, stripped line from the server. Returns <code>None</code> on connection close.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">close()</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Closes the network connection writer and updates state.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">connect()</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Establishes the socket connection to the IRC server.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send_raw(message)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a raw IRC protocol message line to the server.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">read_line()</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Asynchronously reads a single, stripped line from the server. Returns <code>None</code> on connection close.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">close()</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Closes the network connection writer and updates state.</td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="logger-class" class="pt-2 -mt-2">
-                    <h3 class="text-xl font-semibold text-stone-800">The <code>Logger</code> Class (Logging Utility)</h3>
-                    <p class="mt-3 text-stone-600">A utility class for structured logging output to the console and an optional file, with filtering based on configurable log levels.</p>
+                    <h3 class="text-xl font-semibold text-ctp-text">The <code>Logger</code> Class (Logging Utility)</h3>
+                    <p class="mt-3 text-ctp-subtext0">A utility class for structured logging output to the console and an optional file, with filtering based on configurable log levels.</p>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Constructor Arguments (<code>__init__</code>)</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Constructor Arguments (<code>__init__</code>)</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Argument</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -330,16 +394,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">file_path</td><td class="p-4 font-mono text-sm">Optional[str]</td><td class="p-4 text-sm text-stone-600">Path to the log file. If provided, all logs are appended to this file.</td><td class="p-4 font-mono text-sm text-red-700"><code>None</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">min_level</td><td class="p-4 font-mono text-sm">int (LogLevel)</td><td class="p-4 text-sm text-stone-600">The minimum log level (e.g., <code>LogLevel.INFO</code>) required for a message to be outputted.</td><td class="p-4 font-mono text-sm text-red-700"><code>LogLevel.INFO</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">file_path</td><td class="p-4 font-mono text-sm">Optional[str]</td><td class="p-4 text-sm text-ctp-subtext0">Path to the log file. If provided, all logs are appended to this file.</td><td class="p-4 font-mono text-sm text-ctp-red"><code>None</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">min_level</td><td class="p-4 font-mono text-sm">int (LogLevel)</td><td class="p-4 text-sm text-ctp-subtext0">The minimum log level (e.g., <code>LogLevel.INFO</code>) required for a message to be outputted.</td><td class="p-4 font-mono text-sm text-ctp-red"><code>LogLevel.INFO</code></td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Logging Methods</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Logging Methods</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method</th>
                                     <th class="p-4 font-semibold text-sm">Log Level</th>
@@ -347,22 +411,22 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">debug(...)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-stone-600">For fine-grained debugging information, including raw network traffic.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">info(...)</td><td class="p-4 font-mono text-sm">INFO (20)</td><td class="p-4 text-sm text-stone-600">For standard confirmation messages and general bot state changes.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">error(...)</td><td class="p-4 font-mono text-sm">ERROR (40)</td><td class="p-4 text-sm text-stone-600">For critical, non-fatal errors that prevent certain operations.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">raw_recv(line)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-stone-600">Specifically logs a raw line received from the IRC server.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">raw_send(message)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-stone-600">Specifically logs a raw message being sent to the IRC server.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">debug(...)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-ctp-subtext0">For fine-grained debugging information, including raw network traffic.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">info(...)</td><td class="p-4 font-mono text-sm">INFO (20)</td><td class="p-4 text-sm text-ctp-subtext0">For standard confirmation messages and general bot state changes.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">error(...)</td><td class="p-4 font-mono text-sm">ERROR (40)</td><td class="p-4 text-sm text-ctp-subtext0">For critical, non-fatal errors that prevent certain operations.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">raw_recv(line)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-ctp-subtext0">Specifically logs a raw line received from the IRC server.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">raw_send(message)</td><td class="p-4 font-mono text-sm">DEBUG (10)</td><td class="p-4 text-sm text-ctp-subtext0">Specifically logs a raw message being sent to the IRC server.</td></tr>
                              </tbody>
                         </table>
                     </div>
 
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Logging Constants: <code>LogLevel</code> and <code>LOG_PREFIX</code></h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Logging Constants: <code>LogLevel</code> and <code>LOG_PREFIX</code></h4>
 
-                    <h5 class="mt-4 font-medium text-stone-700">The <code>LogLevel</code> Class</h5>
-                    <p class="mt-2 text-sm text-stone-600">Defines standard logging levels used for filtering output verbosity in the <code>Logger</code>.</p>
+                    <h5 class="mt-4 font-medium text-ctp-subtext1">The <code>LogLevel</code> Class</h5>
+                    <p class="mt-2 text-sm text-ctp-subtext0">Defines standard logging levels used for filtering output verbosity in the <code>Logger</code>.</p>
                     <div class="mt-4 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Constant</th>
                                     <th class="p-4 font-semibold text-sm">Value</th>
@@ -370,18 +434,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">DEBUG</td><td class="p-4 font-mono text-sm">10</td><td class="p-4 text-sm text-stone-600">The lowest level; typically includes all raw network I/O.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">INFO</td><td class="p-4 font-mono text-sm">20</td><td class="p-4 text-sm text-stone-600">Standard status messages and successful operations.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">ERROR</td><td class="p-4 font-mono text-sm">40</td><td class="p-4 text-sm text-stone-600">Critical failures or issues preventing core functionality.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">DEBUG</td><td class="p-4 font-mono text-sm">10</td><td class="p-4 text-sm text-ctp-subtext0">The lowest level; typically includes all raw network I/O.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">INFO</td><td class="p-4 font-mono text-sm">20</td><td class="p-4 text-sm text-ctp-subtext0">Standard status messages and successful operations.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">ERROR</td><td class="p-4 font-mono text-sm">40</td><td class="p-4 text-sm text-ctp-subtext0">Critical failures or issues preventing core functionality.</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h5 class="mt-8 font-medium text-stone-700">The <code>LOG_PREFIX</code> Dictionary</h5>
-                    <p class="mt-2 text-sm text-stone-600">A dictionary mapping log categories to short prefixes for organized, human-readable log output.</p>
+                    <h5 class="mt-8 font-medium text-ctp-subtext1">The <code>LOG_PREFIX</code> Dictionary</h5>
+                    <p class="mt-2 text-sm text-ctp-subtext0">A dictionary mapping log categories to short prefixes for organized, human-readable log output.</p>
                     <div class="mt-4 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                            <thead class="border-b bg-stone-100">
+                            <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Key</th>
                                     <th class="p-4 font-semibold text-sm">Prefix</th>
@@ -389,26 +453,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"NET"</td><td class="p-4 font-mono text-sm">"[NET]"</td><td class="p-4 text-sm text-stone-600">Network connection status and disconnects.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"ERROR"</td><td class="p-4 font-mono text-sm">"[ERROR]"</td><td class="p-4 text-sm text-stone-600">Errors caught during processing.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"RAW"</td><td class="p-4 font-mono text-sm">"[RAW]"</td><td class="p-4 text-sm text-stone-600">Unfiltered, raw IRC lines (typically DEBUG level).</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"DISPATCH"</td><td class="p-4 font-mono text-sm">"[DISPATCH]"</td><td class="p-4 text-sm text-stone-600">Event and command handler dispatch actions.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"TASK"</td><td class="p-4 font-mono text-sm">"[TASK]"</td><td class="p-4 text-sm text-stone-600">Background task lifecycle events.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"CORE"</td><td class="p-4 font-mono text-sm">"[CORE]"</td><td class="p-4 text-sm text-stone-600">Bot internal state changes (e.g., registration).</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"USER"</td><td class="p-4 font-mono text-sm">"[USER]"</td><td class="p-4 text-sm text-stone-600">User events like JOIN/PART/QUIT.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">"COMMAND"</td><td class="p-4 font-mono text-sm">"[COMMAND]"</td><td class="p-4 text-sm text-stone-600">When a user executes a command.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">"DCC"</td><td class="p-4 font-mono text-sm">"[DCC]"</td><td class="p-4 text-sm text-stone-600">Direct Client-to-Client (DCC) file transfer events, including connection and progress.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"NET"</td><td class="p-4 font-mono text-sm">"[NET]"</td><td class="p-4 text-sm text-ctp-subtext0">Network connection status and disconnects.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"ERROR"</td><td class="p-4 font-mono text-sm">"[ERROR]"</td><td class="p-4 text-sm text-ctp-subtext0">Errors caught during processing.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"RAW"</td><td class="p-4 font-mono text-sm">"[RAW]"</td><td class="p-4 text-sm text-ctp-subtext0">Unfiltered, raw IRC lines (typically DEBUG level).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"DISPATCH"</td><td class="p-4 font-mono text-sm">"[DISPATCH]"</td><td class="p-4 text-sm text-ctp-subtext0">Event and command handler dispatch actions.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"TASK"</td><td class="p-4 font-mono text-sm">"[TASK]"</td><td class="p-4 text-sm text-ctp-subtext0">Background task lifecycle events.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"CORE"</td><td class="p-4 font-mono text-sm">"[CORE]"</td><td class="p-4 text-sm text-ctp-subtext0">Bot internal state changes (e.g., registration).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">"USER"</td><td class="p-4 font-mono text-sm">"[USER]"</td><td class="p-4 text-sm text-ctp-subtext0">User events like JOIN/PART/QUIT.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">"COMMAND"</td><td class="p-4 font-mono text-sm">"[COMMAND]"</td><td class="p-4 text-sm text-ctp-subtext0">When a user executes a command.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">"DCC"</td><td class="p-4 font-mono text-sm">"[DCC]"</td><td class="p-4 text-sm text-ctp-subtext0">Direct Client-to-Client (DCC) file transfer events, including connection and progress.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="context-class" class="pt-2 -mt-2">
-                     <h3 class="text-xl font-semibold text-stone-800">The <code>Context</code> Class (The Data Carrier)</h3>
-                     <p class="mt-3 text-stone-600">An object passed to all command and event handlers. It contains the message payload, high-level response methods, and access to channel and user objects.</p>
+                     <h3 class="text-xl font-semibold text-ctp-text">The <code>Context</code> Class (The Data Carrier)</h3>
+                     <p class="mt-3 text-ctp-subtext0">An object passed to all command and event handlers. It contains the message payload, high-level response methods, and access to channel and user objects.</p>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Attribute</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -416,22 +480,22 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance. Useful for accessing global properties or methods.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">logger</td><td class="p-4 font-mono text-sm">Logger</td><td class="p-4 text-sm text-stone-600">A convenience reference to <code>bot.logger</code> for quick logging within a context.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">author</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Nickname of the user who triggered the event.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">target</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Destination where the bot should reply.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">message</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The full raw message text received.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">command_name</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The invoked command name (only for standard/prefix commands).</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">arg</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The full argument string following the command/prefix.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">args</td><td class="p-4 font-mono text-sm">List[str]</td><td class="p-4 text-sm text-stone-600">The arguments split by whitespace.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">full_line</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The complete, raw IRC line from the server (used primarily with <code>@bot.on_raw</code>).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-ctp-subtext0">A direct reference to the main <code>Bot</code> instance. Useful for accessing global properties or methods.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">logger</td><td class="p-4 font-mono text-sm">Logger</td><td class="p-4 text-sm text-ctp-subtext0">A convenience reference to <code>bot.logger</code> for quick logging within a context.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">author</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">Nickname of the user who triggered the event.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">target</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">Destination where the bot should reply.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">message</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The full raw message text received.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">command_name</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The invoked command name (only for standard/prefix commands).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">arg</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The full argument string following the command/prefix.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">args</td><td class="p-4 font-mono text-sm">List[str]</td><td class="p-4 text-sm text-ctp-subtext0">The arguments split by whitespace.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">full_line</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-ctp-subtext0">The complete, raw IRC line from the server (used primarily with <code>@bot.on_raw</code>).</td></tr>
                              </tbody>
                         </table>
                     </div>
-                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Response and Interaction Methods</h4>
+                    <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Response and Interaction Methods</h4>
                     <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method / Property</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -440,24 +504,24 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">send(text)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Sends a message to <code>ctx.target</code>.</td><td class="p-4 font-mono text-sm text-sky-700"><code>ctx.send("Reply in channel.")</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">reply(text)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-stone-600">Alias for <code>send()</code> for improved readability.</td><td class="p-4 font-mono text-sm text-sky-700"><code>await ctx.reply("Confirmation received.")</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">author_obj</td><td class="p-4 font-mono text-sm">property (Member)</td><td class="p-4 text-sm text-stone-600">Returns a <code>Member</code> object for the message author.</td><td class="p-4 font-mono text-sm text-sky-700"><code>ctx.author_obj.send("Sent privately.")</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">channel_obj</td><td class="p-4 font-mono text-sm">property (Channel)</td><td class="p-4 text-sm text-stone-600">Returns a <code>Channel</code> object representing the target of the message.</td><td class="p-4 font-mono text-sm text-sky-700"><code>ctx.channel_obj.unban('BadUser')</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">get_member(nick)</td><td class="p-4 font-mono text-sm">method (Member)</td><td class="p-4 text-sm text-stone-600">Retrieves a <code>Member</code> object for any specified nickname.</td><td class="p-4 font-mono text-sm text-sky-700"><code>ctx.get_member('Admin')</code></td></tr>
-                                <tr><td class="p-4 font-mono text-sm">unban(target_user)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Removes ban for a <code>target_user</code> from the current <code>ctx.target</code> channel.</td><td class="p-4 font-mono text-sm text-sky-700"><code>ctx.unban('BannedUser')</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send(text)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a message to <code>ctx.target</code>.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>ctx.send("Reply in channel.")</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">reply(text)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Alias for <code>send()</code> for improved readability.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>await ctx.reply("Confirmation received.")</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">author_obj</td><td class="p-4 font-mono text-sm">property (Member)</td><td class="p-4 text-sm text-ctp-subtext0">Returns a <code>Member</code> object for the message author.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>ctx.author_obj.send("Sent privately.")</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">channel_obj</td><td class="p-4 font-mono text-sm">property (Channel)</td><td class="p-4 text-sm text-ctp-subtext0">Returns a <code>Channel</code> object representing the target of the message.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>ctx.channel_obj.unban('BadUser')</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">get_member(nick)</td><td class="p-4 font-mono text-sm">method (Member)</td><td class="p-4 text-sm text-ctp-subtext0">Retrieves a <code>Member</code> object for any specified nickname.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>ctx.get_member('Admin')</code></td></tr>
+                                <tr><td class="p-4 font-mono text-sm">unban(target_user)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Removes ban for a <code>target_user</code> from the current <code>ctx.target</code> channel.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>ctx.unban('BannedUser')</code></td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                  <section id="member-class" class="pt-2 -mt-2">
-                     <h3 class="text-xl font-semibold text-stone-800">The <code>Member</code> Class (User Interaction & Moderation)</h3>
-                     <p class="mt-3 text-stone-600">A utility class representing a user, focused on private communication and moderator actions.</p>
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Attributes</h4>
+                     <h3 class="text-xl font-semibold text-ctp-text">The <code>Member</code> Class (User Interaction & Moderation)</h3>
+                     <p class="mt-3 text-ctp-subtext0">A utility class representing a user, focused on private communication and moderator actions.</p>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Attributes</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Attribute</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -465,14 +529,14 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-ctp-subtext0">A direct reference to the main <code>Bot</code> instance.</td></tr>
                              </tbody>
                         </table>
                     </div>
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Methods</h4>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Methods</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -481,24 +545,24 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">send(text)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Sends a direct private message (PRIVMSG) to the member's nickname.</td><td class="p-4 font-mono text-sm text-sky-700"><code>user.send("Your query is complete.")</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">kick(channel, reason)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Kicks the member from the specified <code>channel</code>.</td><td class="p-4 font-mono text-sm text-sky-700"><code>user.kick('#general', 'Spam')</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">ban(channel, reason)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Bans the member's hostmask from the specified <code>channel</code>.</td><td class="p-4 font-mono text-sm text-sky-700"><code>user.ban('#general', 'Flood')</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">mute(channel)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Mutes the member (server-side mute/voice removal in channel).</td><td class="p-4 font-mono text-sm text-sky-700"><code>user.mute('#general')</code></td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">unmute(channel)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Unmutes the member.</td><td class="p-4 font-mono text-sm text-sky-700"><code>user.unmute('#general')</code></td></tr>
-                                <tr><td class="p-4 font-mono text-sm">is_muted(channel)</td><td class="p-4 font-mono text-sm">method (bool)</td><td class="p-4 text-sm text-stone-600">Checks the local cache if the user is currently muted/voiced down in the channel.</td><td class="p-4 font-mono text-sm text-sky-700"><code>if user.is_muted('#general'): ...</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send(text)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a direct private message (PRIVMSG) to the member's nickname.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>user.send("Your query is complete.")</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">kick(channel, reason)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Kicks the member from the specified <code>channel</code>.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>user.kick('#general', 'Spam')</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">ban(channel, reason)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Bans the member's hostmask from the specified <code>channel</code>.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>user.ban('#general', 'Flood')</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">mute(channel)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Mutes the member (server-side mute/voice removal in channel).</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>user.mute('#general')</code></td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">unmute(channel)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Unmutes the member.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>user.unmute('#general')</code></td></tr>
+                                <tr><td class="p-4 font-mono text-sm">is_muted(channel)</td><td class="p-4 font-mono text-sm">method (bool)</td><td class="p-4 text-sm text-ctp-subtext0">Checks the local cache if the user is currently muted/voiced down in the channel.</td><td class="p-4 font-mono text-sm text-ctp-blue"><code>if user.is_muted('#general'): ...</code></td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                  <section id="channel-class" class="pt-2 -mt-2">
-                     <h3 class="text-xl font-semibold text-stone-800">The <code>Channel</code> Class (Target Abstraction)</h3>
-                     <p class="mt-3 text-stone-600">A class representing an IRC channel, providing methods for channel-specific management.</p>
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Attributes</h4>
+                     <h3 class="text-xl font-semibold text-ctp-text">The <code>Channel</code> Class (Target Abstraction)</h3>
+                     <p class="mt-3 text-ctp-subtext0">A class representing an IRC channel, providing methods for channel-specific management.</p>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Attributes</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Attribute</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -506,14 +570,14 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-ctp-subtext0">A direct reference to the main <code>Bot</code> instance.</td></tr>
                              </tbody>
                         </table>
                     </div>
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Methods</h4>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Methods</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Method</th>
                                     <th class="p-4 font-semibold text-sm">Type</th>
@@ -521,21 +585,21 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">get_topic()</td><td class="p-4 font-mono text-sm">method (str)</td><td class="p-4 text-sm text-stone-600">Returns the current topic of the channel.</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">set_topic(new_topic)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Sets a new topic for the channel.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">unban(user_mask)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-stone-600">Removes a ban by <code>user_mask</code> (e.g., <code>*!*@host</code>).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">get_topic()</td><td class="p-4 font-mono text-sm">method (str)</td><td class="p-4 text-sm text-ctp-subtext0">Returns the current topic of the channel.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">set_topic(new_topic)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sets a new topic for the channel.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">unban(user_mask)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Removes a ban by <code>user_mask</code> (e.g., <code>*!*@host</code>).</td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="task-runner" class="pt-2 -mt-2">
-                     <h3 class="text-xl font-semibold text-stone-800">Asynchronous Task Runner</h3>
-                     <p class="mt-3 text-stone-600">The framework includes a simple mechanism for defining and running background, repeating asynchronous tasks without blocking the main event loop. **Tasks must be explicitly started using <code>bot.start_task(...)</code>, usually within an <code>@bot.on_ready()</code> handler.**</p>
-                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Task Definition and Control</h4>
+                     <h3 class="text-xl font-semibold text-ctp-text">Asynchronous Task Runner</h3>
+                     <p class="mt-3 text-ctp-subtext0">The framework includes a simple mechanism for defining and running background, repeating asynchronous tasks without blocking the main event loop. **Tasks must be explicitly started using <code>bot.start_task(...)</code>, usually within an <code>@bot.on_ready()</code> handler.**</p>
+                     <h4 class="mt-8 mb-4 font-semibold text-ctp-text">Task Definition and Control</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
-                             <thead class="border-b bg-stone-100">
+                             <thead class="border-b border-ctp-surface2 bg-ctp-surface1">
                                 <tr>
                                     <th class="p-4 font-semibold text-sm">Decorator / Method</th>
                                     <th class="p-4 font-semibold text-sm">Parameters</th>
@@ -543,21 +607,21 @@
                                 </tr>
                             </thead>
                              <tbody>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.task(...)</td><td class="p-4 font-mono text-sm"><code>interval</code> (float), <code>max_repeat</code> (int, optional)</td><td class="p-4 text-sm text-stone-600">Decorator to mark an <code>async</code> function as a repeating task. <code>max_repeat</code> sets a limit, after which the task stops.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">bot.start_task(func, *args)</td><td class="p-4 font-mono text-sm"><code>task_func</code>, <code>args</code> (optional)</td><td class="p-4 text-sm text-stone-600">Initiates the task defined by <code>@bot.task</code>, passing any arguments required by the function.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.task(...)</td><td class="p-4 font-mono text-sm"><code>interval</code> (float), <code>max_repeat</code> (int, optional)</td><td class="p-4 text-sm text-ctp-subtext0">Decorator to mark an <code>async</code> function as a repeating task. <code>max_repeat</code> sets a limit, after which the task stops.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">bot.start_task(func, *args)</td><td class="p-4 font-mono text-sm"><code>task_func</code>, <code>args</code> (optional)</td><td class="p-4 text-sm text-ctp-subtext0">Initiates the task defined by <code>@bot.task</code>, passing any arguments required by the function.</td></tr>
                              </tbody>
                         </table>
                     </div>
                 </section>
 
                 <section id="example-script">
-                    <h2 class="text-2xl font-bold text-stone-900">Example Bot Script</h2>
-                    <p class="mt-4 text-stone-600">This script demonstrates command handling, prefix commands, asynchronous tasks, and event handlers.</p>
-                    <div class="mt-6 bg-stone-800 rounded-lg text-sm code-block">
+                    <h2 class="text-2xl font-bold text-ctp-text">Example Bot Script</h2>
+                    <p class="mt-4 text-ctp-subtext0">This script demonstrates command handling, prefix commands, asynchronous tasks, and event handlers.</p>
+                    <div class="mt-6 bg-ctp-surface0 rounded-lg text-sm code-block">
                         <button class="copy-btn" title="Copy to clipboard" id="copy-button">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
-                        <pre class="p-6 text-stone-200 overflow-x-auto"><code id="python-example-code" class="language-python">
+                        <pre class="p-6 text-ctp-text overflow-x-auto"><code id="python-example-code" class="language-python">
 from nIRC.irc import Bot, Context, IRCConnection, Logger, DCCFile
 from typing import Optional
 import asyncio, time
