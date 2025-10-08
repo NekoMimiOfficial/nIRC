@@ -1,4 +1,4 @@
-from nIRC.irc import Bot, Context, IRCConnection, Logger
+from nIRC.irc import Bot, Context, IRCConnection, Logger, DCCFile, Member
 from typing import Optional
 import asyncio, time
 
@@ -104,7 +104,9 @@ async def keyword_responder(ctx: Context):
 @Bot.on_join()
 async def greet_joiner(ctx: Context):
     """Sends a friendly greeting when a new user joins."""
-    if ctx.author != BOT_NICK:
+    if ctx.author != ctx.bot.nick:
+        print(ctx.target)
+        print(ctx.full_line)
         await ctx.reply(f"Welcome, {ctx.author}! Type '{COMMAND_PREFIX}calc 1+1' to test a command.")
 
 @Bot.on_raw()
@@ -126,6 +128,13 @@ async def status_announcement(bot_instance: Bot, channel_name: str):
         f"[HEARTBEAT] Task iteration {count}/5. Time: {time.strftime('%H:%M:%S')}. (Interval: 10s)"
     )
 
+@Bot.on_dcc()
+async def get_file(file: DCCFile):
+    file.context.logger.info("USER", f"Accepting file '{file.filename}' from {file.sender}.")
+    user = Member(file.context.bot, file.sender)
+    await user.send("Thanks for the file, it's *definitely* safe :3")
+    await file.start_transfer()
+
 @Bot.on_ready()
 async def initialization_setup(bot: Bot):
     """
@@ -146,6 +155,7 @@ async def initialization_setup(bot: Bot):
 
 async def run_bot():
     """Main entry point to initialize and run the bot."""
+    global logger
     logger= Logger(file_path= "log.txt", min_level= 0)
 
     irc_connection = IRCConnection(SERVER, PORT, logger)

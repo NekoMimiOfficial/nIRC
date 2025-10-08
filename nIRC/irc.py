@@ -1,7 +1,8 @@
-from typing import Dict, Optional, Callable, Any, List, Tuple
+from typing import Dict, Optional, Callable, Any, List, Tuple, Set
 from datetime import datetime
 from functools import wraps
-import asyncio, re, sys
+import asyncio, re, sys, os
+import struct
 
 class LogLevel:
     """
@@ -20,6 +21,7 @@ LOG_PREFIX = {
     "CORE": "[CORE]",
     "USER": "[USER]",
     "COMMAND": "[COMMAND]",
+    "DCC": "[DCC]"
 }
 
 LOG_NET_ATTEMPT = "Attempting connection to {host}:{port}..."
@@ -43,6 +45,21 @@ LOG_REGISTRATION_SENT = "Bot Registration Sent. Entering Main Network Loop"
 LOG_LOOP_ENDED = "Bot Main Loop Ended. Disconnecting."
 LOG_READY_HANDLER_ERROR = "Error in on_ready handler '{handler_name}': {error}"
 LOG_PREFIX_COMMAND_OVERWRITTEN = "Warning: Prefix command '{prefix}' is being overwritten."
+LOG_DCC_TRANSFER_INITIATED = "TRANSFER INITIATED for {safe_filename} from {sender}"
+LOG_DCC_CONNECT_ESTABLISHED = "Connection established. Receiving file: {safe_filename}"
+LOG_DCC_TIMEOUT = "Operation timed out (Connection or Transfer)."
+LOG_DCC_CONNECT_REFUSED = "Connection refused by DCC sender at {ip_address}:{port}."
+LOG_DCC_SETUP_ERROR = "An unexpected error occurred during DCC transfer setup: {error}"
+LOG_DCC_TRANSFER_FINISHED = "Transfer attempt for {safe_filename} finished."
+LOG_DCC_SENDER_CLOSED = "Connection closed by sender after {received_bytes} bytes."
+LOG_DCC_PROGRESS = "-> Progress: {percent:.2f}% ({received_bytes} / {filesize} bytes)"
+LOG_DCC_SUCCESS = "SUCCESS: File '{safe_filename}' saved completely."
+LOG_DCC_SIZE_MISMATCH = "TRANSFER COMPLETE with size mismatch. Expected: {filesize}, Received: {received_bytes}"
+LOG_DCC_READ_STALL = "Transfer read stalled for {safe_filename}. Closing connection."
+LOG_DCC_TRANSFER_LOOP_ERROR = "An unexpected error occurred during the transfer loop: {error}"
+LOG_DCC_IP_CONVERT_ERROR = "ERROR converting IP: {ip_long} - {error}"
+LOG_DCC_EVENT_DISPATCH = "Dispatching 'on_dcc' event for {safe_filename}..."
+LOG_DOWNLOADS_DIR_INIT = "Created downloads directory: {dirname}."
 
 
 class Logger:
@@ -162,13 +179,32 @@ _event_registry: Dict[str, List[Callable]] = {
     'on_join': [],
     'on_leave': [],
     'on_raw': [],
-    'on_ready': []
+    'on_ready': [],
+    'on_dcc' : []
 }
 _task_registry: Dict[str, Callable] = {}
 
 IRC_RE = re.compile(
     r'^(?:[:](\S+) )?(\S+)(?: (?!:)(.+?))?(?: :(.*))?$'
 )
+
+# PRIVMSG <recipient> :DCC SEND <filename> <ip> <port> <filesize>
+DCC_SEND_REGEX = re.compile(
+    r"DCC SEND (?P<filename>.+?) (?P<ip>\d+) (?P<port>\d+) (?P<filesize>\d+)",
+    re.IGNORECASE
+)
+
+def ip_long_to_dotted(ip_long: int) -> str:
+    """
+    Converts a long integer IP representation (Network Byte Order/Big Endian)
+    to a dotted string (IPv4) without relying on the synchronous 'socket' module.
+    """
+    # Extract the four octets using bitwise shifts and masks
+    a = (ip_long >> 24) & 0xFF
+    b = (ip_long >> 16) & 0xFF
+    c = (ip_long >> 8) & 0xFF
+    d = ip_long & 0xFF
+    return f"{a}.{b}.{c}.{d}"
 
 class IRCConnection:
     """
@@ -276,7 +312,7 @@ class Member:
         @arg nick: The nickname of the member.
         @return: None
         """
-        self._bot = bot
+        self.bot = bot
         self.nick = nick
 
     async def send(self, text: str):
@@ -285,7 +321,7 @@ class Member:
         @arg text: The message content to send.
         @return: None
         """
-        await self._bot.send_message(self.nick, text)
+        await self.bot.send_message(self.nick, text)
 
     async def kick(self, channel: str, reason: str = "Requested by bot"):
         """
@@ -294,7 +330,7 @@ class Member:
         @kwarg reason: The kick message/reason. (default: "Requested by bot")
         @return: None
         """
-        await self._bot.conn.send_raw(f"KICK {channel} {self.nick} :{reason}")
+        await self.bot.conn.send_raw(f"KICK {channel} {self.nick} :{reason}")
 
     async def ban(self, channel: str, reason: str = "Banned by bot"):
         """
@@ -303,7 +339,7 @@ class Member:
         @kwarg reason: The kick message/reason. (default: "Banned by bot")
         @return: None
         """
-        await self._bot.conn.send_raw(f"MODE {channel} +b {self.nick}!*@*")
+        await self.bot.conn.send_raw(f"MODE {channel} +b {self.nick}!*@*")
         await self.kick(channel, reason)
 
     async def mute(self, channel: str):
@@ -312,8 +348,8 @@ class Member:
         @arg channel: The channel name (e.g., '#main').
         @return: None
         """
-        await self._bot.conn.send_raw(f"MODE {channel} -v {self.nick}")
-        self._bot._mute_status.setdefault(channel, set()).add(self.nick)
+        await self.bot.conn.send_raw(f"MODE {channel} -v {self.nick}")
+        self.bot._mute_status.setdefault(channel, set()).add(self.nick)
 
     async def unmute(self, channel: str):
         """
@@ -321,9 +357,9 @@ class Member:
         @arg channel: The channel name (e.g., '#main').
         @return: None
         """
-        await self._bot.conn.send_raw(f"MODE {channel} +v {self.nick}")
-        if channel in self._bot._mute_status and self.nick in self._bot._mute_status[channel]:
-            self._bot._mute_status[channel].remove(self.nick)
+        await self.bot.conn.send_raw(f"MODE {channel} +v {self.nick}")
+        if channel in self.bot._mute_status and self.nick in self.bot._mute_status[channel]:
+            self.bot._mute_status[channel].remove(self.nick)
 
     def is_muted(self, channel: str) -> bool:
         """
@@ -331,7 +367,7 @@ class Member:
         @arg channel: The channel name.
         @return: True if the member is considered muted in the channel, False otherwise.
         """
-        return self.nick in self._bot._mute_status.get(channel, set())
+        return self.nick in self.bot._mute_status.get(channel, set())
 
 
 class Channel:
@@ -345,7 +381,7 @@ class Channel:
         @arg name: The name of the channel (e.g., '#mychannel').
         @return: None
         """
-        self._bot = bot
+        self.bot = bot
         self.name = name
 
     async def get_topic(self) -> str:
@@ -355,7 +391,7 @@ class Channel:
         This is a placeholder that sends the request and returns an empty string immediately.
         @return: The current topic of the channel (placeholder returns empty string).
         """
-        await self._bot.conn.send_raw(f"TOPIC {self.name}")
+        await self.bot.conn.send_raw(f"TOPIC {self.name}")
         # In a real async bot, this would use an Event/Future to wait for the 332 numeric
         return ""
 
@@ -365,7 +401,7 @@ class Channel:
         @arg new_topic: The new topic string.
         @return: None
         """
-        await self._bot.conn.send_raw(f"TOPIC {self.name} :{new_topic}")
+        await self.bot.conn.send_raw(f"TOPIC {self.name} :{new_topic}")
 
     async def unban(self, user_mask: str):
         """
@@ -373,7 +409,7 @@ class Channel:
         @arg user_mask: The mask of the user to unban (e.g., 'nick!user@host').
         @return: None
         """
-        await self._bot.conn.send_raw(f"MODE {self.name} -b {user_mask}")
+        await self.bot.conn.send_raw(f"MODE {self.name} -b {user_mask}")
 
 class Context:
     """
@@ -391,9 +427,10 @@ class Context:
         @kwarg full_line: The complete raw IRC line. (default: "")
         @return: None
         """
-        self._bot = bot
+        self.bot = bot
         self.target = target
         self.author = author
+        self.logger = bot.logger
         self.message = message
         self.full_line = full_line
         self.command_type = command
@@ -409,8 +446,8 @@ class Context:
         @arg text: The message content to send.
         @return: None
         """
-        recipient = self.author if self.target == self._bot.nick else self.target
-        await self._bot.send_message(recipient, text)
+        recipient = self.author if self.target == self.bot.nick else self.target
+        await self.bot.send_message(recipient, text)
 
     async def send(self, text: str):
         """
@@ -426,7 +463,7 @@ class Context:
         Returns a Member object for the message author.
         @return: A Member object representing the sender.
         """
-        return self._bot.get_member(self.author)
+        return self.bot.get_member(self.author)
 
     @property
     def channel_obj(self) -> Channel:
@@ -434,7 +471,7 @@ class Context:
         Returns a Channel object for the message target (only valid for channel messages).
         @return: A Channel object.
         """
-        return Channel(self._bot, self.target)
+        return Channel(self.bot, self.target)
 
     def get_member(self, nick: str) -> Member:
         """
@@ -442,7 +479,7 @@ class Context:
         @arg nick: The nickname of the member to retrieve.
         @return: A Member object.
         """
-        return Member(self._bot, nick)
+        return Member(self.bot, nick)
 
     async def unban(self, target_user: str):
         """
@@ -454,12 +491,114 @@ class Context:
         await self.channel_obj.unban(target_user)
 
 
+class DCCFile:
+    """
+    Initializes the DCC file object.
+    @arg context: The context object.
+    @arg filename: The filename of the file in the DCC send request.
+    @arg ip_address: The source IP address.
+    @arg port: The source port.
+    @arg filesize: The size of the file.
+    @arg save_dir: The directory to save the file into. (defaule: ./downloads/)
+    @return: None
+    """
+    def __init__(self, context: Context, filename: str, ip_address: str, port: int, filesize: int, save_dir: str):
+        self.context = context
+        self.sender = context.author
+        self.filename = filename.strip().strip('"')
+        self.ip_address = ip_address
+        self.port = port
+        self.filesize = filesize
+        self.save_dir = save_dir
+        self.safe_filename = os.path.basename(self.filename).replace(' ', '_')
+        self.full_path = os.path.join(self.save_dir, self.safe_filename)
+        _, self.extension = os.path.splitext(self.filename)
+        self.is_good = True
+        self.is_done = False
+        self.progress = 0
+        self.percent = 0
+
+    async def start_transfer(self, connect_timeout=10, ack_chunk_size=4096):
+        """
+        Starts the transfer process.
+        @kwarg connect_timeout: The connection timeout. (default: 10)
+        @kwarg ack_chunk_size: The transfer chunk size. (default: 4096)
+        @return: None
+        """
+        self.context.bot.logger.info("DCC", LOG_DCC_TRANSFER_INITIATED, safe_filename=self.safe_filename, sender=self.sender)
+
+        reader, writer = None, None
+        try:
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(self.ip_address, self.port),
+                timeout=connect_timeout
+            )
+            self.context.bot.logger.info("DCC", LOG_DCC_CONNECT_ESTABLISHED, safe_filename=self.safe_filename)
+
+            await self._transfer_loop(reader, writer, ack_chunk_size)
+
+        except asyncio.TimeoutError:
+            self.context.bot.logger.error("DCC", LOG_DCC_TIMEOUT)
+            self.is_good = False
+        except ConnectionRefusedError:
+            self.context.bot.logger.error("DCC", LOG_DCC_CONNECT_REFUSED, ip_address=self.ip_address, port=self.port)
+            self.is_good = False
+        except Exception as e:
+            self.context.bot.logger.error("DCC", LOG_DCC_SETUP_ERROR, error=e)
+            self.is_good = False
+        finally:
+            if writer and not writer.is_closing():
+                writer.close()
+                await writer.wait_closed()
+            self.context.bot.logger.info("DCC", LOG_DCC_TRANSFER_FINISHED, safe_filename=self.safe_filename)
+
+        self.is_done = True
+
+
+    async def _transfer_loop(self, reader, writer, ack_chunk_size):
+        received_bytes = 0
+
+        try:
+            with open(self.full_path, 'wb') as f:
+                while received_bytes < self.filesize:
+                    data = await asyncio.wait_for(
+                        reader.read(ack_chunk_size),
+                        timeout=30
+                    )
+
+                    if not data:
+                        self.context.bot.logger.info("DCC", LOG_DCC_SENDER_CLOSED, received_bytes=received_bytes)
+                        break
+
+                    f.write(data)
+                    received_bytes += len(data)
+
+                    ack_message = struct.pack("!I", received_bytes)
+                    writer.write(ack_message)
+                    await writer.drain()
+
+                    if received_bytes % (1024 * 1024 * 5) == 0 or received_bytes == self.filesize:
+                        percent = (received_bytes / self.filesize) * 100 if self.filesize > 0 else 0
+                        self.context.bot.logger.info("DCC", LOG_DCC_PROGRESS, percent=percent, received_bytes=received_bytes, filesize=self.filesize)
+                        self.progress, self.percent = received_bytes, percent
+
+            if received_bytes == self.filesize:
+                self.context.bot.logger.info("DCC", LOG_DCC_SUCCESS, safe_filename=self.safe_filename)
+            else:
+                self.context.bot.logger.error("DCC", LOG_DCC_SIZE_MISMATCH, filesize=self.filesize, received_bytes=received_bytes)
+
+        except asyncio.TimeoutError:
+            self.context.bot.logger.error("DCC", LOG_DCC_READ_STALL, safe_filename=self.safe_filename)
+        except Exception as e:
+            self.context.bot.logger.error("DCC", LOG_DCC_TRANSFER_LOOP_ERROR, error=e)
+
+
 class Bot:
     """
     The core IRC bot client. Manages connection state, event dispatching,
     commands, and background tasks.
     """
-    def __init__(self, prefix: str, conn: IRCConnection, nick: str, username: str, realname: str, password: Optional[str] = None):
+    def __init__(self, prefix: str, conn: IRCConnection, nick: str, username: str, realname: str, password: Optional[str] = None, downloads_dir: str = "downloads"):
         """
         Initializes the Bot instance.
         @arg prefix: The command prefix (e.g., '!' or '.').
@@ -482,6 +621,7 @@ class Bot:
 
         self.conn = conn
         self.logger = conn.logger
+        self.save_dir = downloads_dir
 
         self.commands: Dict[str, Callable] = _command_registry.copy()
         self.prefix_commands: Dict[str, Callable] = _prefix_command_registry.copy()
@@ -542,6 +682,19 @@ class Bot:
         """
         def decorator(func: Callable):
             _event_registry['on_message'].append(func)
+            return func
+        return decorator
+
+    @staticmethod
+    def on_dcc():
+        """
+        Decorator for DCC SEND request handler.
+        @return: The decorator function.
+        """
+        def decorator(func: Callable):
+            if not asyncio.iscoroutinefunction(func):
+                raise TypeError("@Bot.on_dcc function must be an async function.")
+            _event_registry['on_dcc'].append(func)
             return func
         return decorator
 
@@ -668,7 +821,8 @@ class Bot:
 
     def _parse_line(self, line: str) -> Tuple[str, str, str, str, str]:
         match = IRC_RE.match(line)
-        if not match: return ("", "", "", "", line)
+        if not match:
+            return ("", "", "", "", line)
 
         prefix, command, target_part, message = match.groups()
 
@@ -678,7 +832,8 @@ class Bot:
         elif prefix:
             author_nick = prefix
 
-        target = target_part.split()[0] if target_part else ""
+        target_system = message.strip() if message and message.startswith("#") else ""
+        target = target_part.split()[0] if target_part else target_system
 
         return (prefix or "", command or "", target or "", author_nick or "", message or "")
 
@@ -689,6 +844,7 @@ class Bot:
             logger.info("NET", LOG_NET_PONG)
             return True
         return False
+
 
     async def _dispatch_line(self, line: str):
         logger = self.conn.logger
@@ -756,6 +912,31 @@ class Bot:
             for handler in self.event_handlers['on_message']:
                 await handler(ctx)
 
+        else:
+            dcc_match = DCC_SEND_REGEX.search(ctx.message)
+
+            if dcc_match:
+                data = dcc_match.groupdict()
+
+                ip_long = int(data['ip'])
+                try:
+                    ip_address = ip_long_to_dotted(ip_long)
+                except OSError as e:
+                    self.logger.error("DCC", LOG_DCC_IP_CONVERT_ERROR, ip_long=ip_long, error=e)
+                    return
+
+                file_port = int(data['port'])
+                file_size = int(data['filesize'])
+                file_name = data['filename']
+
+                dcc_file = DCCFile(
+                    ctx, file_name, ip_address, file_port, file_size, self.save_dir
+                )
+
+                self.logger.info("DCC", LOG_DCC_EVENT_DISPATCH, safe_filename=dcc_file.safe_filename)
+                for handler in self.event_handlers['on_dcc']:
+                    asyncio.create_task(handler(dcc_file))
+
     async def _run_on_ready_handlers(self):
         logger = self.conn.logger
         logger.info("CORE", LOG_READY_DISPATCH)
@@ -803,6 +984,9 @@ class Bot:
         await asyncio.sleep(0.5)
 
         logger.info("CORE", LOG_REGISTRATION_SENT)
+        if not os.path.exists(self.save_dir):
+            os.mkdir(self.save_dir)
+            self.logger.info("CORE", LOG_DOWNLOADS_DIR_INIT, dirname = self.save_dir)
 
         while self.running and self.conn.connected:
             line = await self.conn.read_line()

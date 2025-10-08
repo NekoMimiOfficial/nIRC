@@ -66,6 +66,7 @@
                     <a href="#abstractions" class="block py-2 px-3 text-stone-600 nav-link font-medium">Core Abstractions</a>
                     <div class="ml-4 mt-2 space-y-2 border-l-2 border-stone-200">
                         <a href="#bot-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Bot Class</a>
+                        <a href="#dccfile-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">DCCFile Class</a>
                         <a href="#irc-connection-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">IRCConnection</a>
                         <a href="#logger-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Logger Class</a>
                         <a href="#context-class" class="block py-1.5 px-3 text-sm text-stone-500 nav-link">Context Class</a>
@@ -164,11 +165,12 @@
                             </thead>
                             <tbody>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">prefix</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The command prefix (e.g., <code>!</code> or <code>.</code>).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
-                                <tr class="border-b"><td class="p-4 font-mono text-sm">connection</td><td class="p-4 font-mono text-sm">IRCConnection</td><td class="p-4 text-sm text-stone-600">The pre-configured <code>IRCConnection</code> object used for I/O.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">conn</td><td class="p-4 font-mono text-sm">IRCConnection</td><td class="p-4 text-sm text-stone-600">The pre-configured <code>IRCConnection</code> object used for I/O.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">nick</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's primary nickname.</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">username</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's username (IDENT).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">realname</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The bot's real name (GECOS).</td><td class="p-4 font-mono text-sm text-green-700">Yes</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">password</td><td class="p-4 font-mono text-sm">Optional[str]</td><td class="p-4 text-sm text-stone-600">Password for NickServ identification, if required. (Default: <code>None</code>)</td><td class="p-4 font-mono text-sm text-red-700">No</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">downloads_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Directory for saving files from DCC send requests. (Default: <code>downloads</code>)</td><td class="p-4 font-mono text-sm text-red-700">No</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -209,8 +211,62 @@
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_message()</td><td class="p-4 text-sm">Any Channel Message</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Fires on all <code>PRIVMSG</code> events that are **not** commands. Essential for keyword checks.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_join()</td><td class="p-4 text-sm">User joins channel</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds a function to the JOIN IRC event.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_leave()</td><td class="p-4 text-sm">User parts or quits</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds a function to the PART or QUIT IRC event.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">@bot.on_dcc()</td><td class="p-4 text-sm">DCC File Transfer</td><td class="p-4 font-mono text-sm"><code>DCCFile</code> instance</td><td class="p-4 text-sm text-stone-600">Fires when the bot receives a DCC SEND request and initiates the file transfer process.</td></tr>
                                 <tr><td class="p-4 font-mono text-sm">@bot.prefix_command(prefix)</td><td class="p-4 text-sm">Prefixless Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-stone-600">Binds to a message starting with <code>prefix</code> (e.g., <code>&gt;</code>).</td></tr>
                              </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="dccfile-class" class="pt-2 -mt-2">
+                    <h3 class="text-xl font-semibold text-stone-800">The <code>DCCFile</code> Class (DCC File Transfer)</h3>
+                    <p class="mt-3 text-stone-600">
+                        This class is passed when the <code>@bot.on_dcc()</code> event fires. It represents an incoming Direct Client-to-Client (DCC) SEND request and provides access to file metadata and transfer progress.
+                    </p>
+
+                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Key Attributes (Metadata and Status)</h4>
+                    <div class="mt-6 overflow-x-auto">
+                        <table class="w-full min-w-max text-left border-collapse">
+                            <thead class="border-b bg-stone-100">
+                                <tr>
+                                    <th class="p-4 font-semibold text-sm">Attribute</th>
+                                    <th class="p-4 font-semibold text-sm">Type</th>
+                                    <th class="p-4 font-semibold text-sm">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">context</td><td class="p-4 font-mono text-sm">Context</td><td class="p-4 text-sm text-stone-600">The context object.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The name of the file being sent, as reported in the DCC command.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">extension</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The file extension.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">filesize</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The total expected size of the file in bytes.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">ip_address</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The dotted IPv4 address (e.g., <code>12.34.56.78</code>) of the sending client.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">port</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The port number the sender is listening on for the DCC connection.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">is_done</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-stone-600">Whether the file is done sending.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">is_good</td><td class="p-4 font-mono text-sm">bool</td><td class="p-4 text-sm text-stone-600">Whether the file operation completed without errors.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">percent</td><td class="p-4 font-mono text-sm">float</td><td class="p-4 text-sm text-stone-600">The percentage of the operation.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">progress</td><td class="p-4 font-mono text-sm">int</td><td class="p-4 text-sm text-stone-600">The progress in bytes of how much data got transfered.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">sender</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The nickname of the user who initiated the file transfer.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">full_path</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The full local path where the file is being saved.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">safe_filename</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The filename but with underscores instead of spaces.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">save_dir</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The parent directory to where the file will be saved into.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="mt-8 mb-4 font-semibold text-stone-800">Helper Methods</h4>
+                    <div class="mt-6 overflow-x-auto">
+                        <table class="w-full min-w-max text-left border-collapse">
+                            <thead class="border-b bg-stone-100">
+                                <tr>
+                                    <th class="p-4 font-semibold text-sm">Method / Property</th>
+                                    <th class="p-4 font-semibold text-sm">Type</th>
+                                    <th class="p-4 font-semibold text-sm">Description</th>
+                                    <th class="p-4 font-semibold text-sm">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">start_transfer</td><td class="p-4 font-mono text-sm">property (None)</td><td class="p-4 text-sm text-stone-600">Starts the transfer process and returns a bool depending on whether it failed or succeeded.</td><td class="p-4 font-mono text-sm text-sky-700"><code>dcc_file.start_transfer()</code></td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </section>
@@ -340,7 +396,8 @@
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">"TASK"</td><td class="p-4 font-mono text-sm">"[TASK]"</td><td class="p-4 text-sm text-stone-600">Background task lifecycle events.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">"CORE"</td><td class="p-4 font-mono text-sm">"[CORE]"</td><td class="p-4 text-sm text-stone-600">Bot internal state changes (e.g., registration).</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">"USER"</td><td class="p-4 font-mono text-sm">"[USER]"</td><td class="p-4 text-sm text-stone-600">User events like JOIN/PART/QUIT.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">"COMMAND"</td><td class="p-4 font-mono text-sm">"[COMMAND]"</td><td class="p-4 text-sm text-stone-600">When a user executes a command.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">"COMMAND"</td><td class="p-4 font-mono text-sm">"[COMMAND]"</td><td class="p-4 text-sm text-stone-600">When a user executes a command.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">"DCC"</td><td class="p-4 font-mono text-sm">"[DCC]"</td><td class="p-4 text-sm text-stone-600">Direct Client-to-Client (DCC) file transfer events, including connection and progress.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -359,6 +416,8 @@
                                 </tr>
                             </thead>
                              <tbody>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance. Useful for accessing global properties or methods.</td></tr>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">logger</td><td class="p-4 font-mono text-sm">Logger</td><td class="p-4 text-sm text-stone-600">A convenience reference to <code>bot.logger</code> for quick logging within a context.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">author</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Nickname of the user who triggered the event.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">target</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">Destination where the bot should reply.</td></tr>
                                 <tr class="border-b"><td class="p-4 font-mono text-sm">message</td><td class="p-4 font-mono text-sm">str</td><td class="p-4 text-sm text-stone-600">The full raw message text received.</td></tr>
@@ -395,6 +454,22 @@
                  <section id="member-class" class="pt-2 -mt-2">
                      <h3 class="text-xl font-semibold text-stone-800">The <code>Member</code> Class (User Interaction & Moderation)</h3>
                      <p class="mt-3 text-stone-600">A utility class representing a user, focused on private communication and moderator actions.</p>
+                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Attributes</h4>
+                     <div class="mt-6 overflow-x-auto">
+                        <table class="w-full min-w-max text-left border-collapse">
+                             <thead class="border-b bg-stone-100">
+                                <tr>
+                                    <th class="p-4 font-semibold text-sm">Attribute</th>
+                                    <th class="p-4 font-semibold text-sm">Type</th>
+                                    <th class="p-4 font-semibold text-sm">Description</th>
+                                </tr>
+                            </thead>
+                             <tbody>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance.</td></tr>
+                             </tbody>
+                        </table>
+                    </div>
+                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Methods</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
                              <thead class="border-b bg-stone-100">
@@ -420,6 +495,22 @@
                  <section id="channel-class" class="pt-2 -mt-2">
                      <h3 class="text-xl font-semibold text-stone-800">The <code>Channel</code> Class (Target Abstraction)</h3>
                      <p class="mt-3 text-stone-600">A class representing an IRC channel, providing methods for channel-specific management.</p>
+                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Attributes</h4>
+                     <div class="mt-6 overflow-x-auto">
+                        <table class="w-full min-w-max text-left border-collapse">
+                             <thead class="border-b bg-stone-100">
+                                <tr>
+                                    <th class="p-4 font-semibold text-sm">Attribute</th>
+                                    <th class="p-4 font-semibold text-sm">Type</th>
+                                    <th class="p-4 font-semibold text-sm">Description</th>
+                                </tr>
+                            </thead>
+                             <tbody>
+                                <tr class="border-b"><td class="p-4 font-mono text-sm">bot</td><td class="p-4 font-mono text-sm">Bot</td><td class="p-4 text-sm text-stone-600">A direct reference to the main <code>Bot</code> instance.</td></tr>
+                             </tbody>
+                        </table>
+                    </div>
+                     <h4 class="mt-8 mb-4 font-semibold text-stone-800">Methods</h4>
                      <div class="mt-6 overflow-x-auto">
                         <table class="w-full min-w-max text-left border-collapse">
                              <thead class="border-b bg-stone-100">
@@ -467,7 +558,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
                         <pre class="p-6 text-stone-200 overflow-x-auto"><code id="python-example-code" class="language-python">
-from nIRC.irc import Bot, Context, IRCConnection, Logger
+from nIRC.irc import Bot, Context, IRCConnection, Logger, DCCFile
 from typing import Optional
 import asyncio, time
 
@@ -595,6 +686,11 @@ async def status_announcement(bot_instance: Bot, channel_name: str):
         f"[HEARTBEAT] Task iteration {count}/5. Time: {time.strftime('%H:%M:%S')}. (Interval: 10s)"
     )
 
+@Bot.on_dcc()
+async def get_file(file: DCCFile):
+    logger.info("USER", f"Accepting file '{file.filename}' from {file.sender}.")
+    await file.start_transfer()
+
 @Bot.on_ready()
 async def initialization_setup(bot: Bot):
     """
@@ -615,6 +711,7 @@ async def initialization_setup(bot: Bot):
 
 async def run_bot():
     """Main entry point to initialize and run the bot."""
+    global logger
     logger= Logger(file_path= "log.txt", min_level= 0)
 
     irc_connection = IRCConnection(SERVER, PORT, logger)
@@ -649,6 +746,7 @@ if __name__ == "__main__":
             print("\n[ERROR] Event loop error. If running in an interactive session, this is normal.")
         else:
             raise
+
 </code></pre>
                     </div>
                 </section>
@@ -663,12 +761,9 @@ if __name__ == "__main__":
             const codeBlockElement = document.getElementById('python-example-code');
             const copyButton = document.getElementById('copy-button');
 
-            // 1. Update Copy Button logic to copy the raw content of the <pre> block
             copyButton.addEventListener('click', () => {
-                // Read the static text content
                 const rawCodeText = codeBlockElement.textContent;
 
-                // Convert HTML entities (&lt; and &gt;) back to characters for runnable code
                 const codeToCopy = rawCodeText
                     .replace(/&lt;/g, '<')
                     .replace(/&gt;/g, '>');
@@ -685,7 +780,6 @@ if __name__ == "__main__":
             });
 
 
-            // 2. Navigation Intersection Observer (for active state highlighting)
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
@@ -701,8 +795,7 @@ if __name__ == "__main__":
                             if (link.getAttribute('href') === `#${id}`) {
                                 link.classList.add('active-nav');
                             }
-                            // Special handling for nested links
-                            if (['bot-class', 'irc-connection-class', 'logger-class', 'context-class', 'member-class', 'channel-class', 'task-runner'].includes(id)) {
+                            if (['bot-class', 'irc-connection-class', 'logger-class', 'context-class', 'member-class', 'channel-class', 'dccfile-class', 'task-runner'].includes(id)) {
                                 document.querySelector('a[href="#abstractions"]').classList.add('active-nav');
                             }
                         });

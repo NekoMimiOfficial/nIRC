@@ -11,3 +11,4 @@ pycache/
 *.pyc
 *.pyd
 *.pyo
+downloads/

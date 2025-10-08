@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nIRC"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
 { name="NekoMimiOfficial", email="nekomimi@tilde.team" },
 ]

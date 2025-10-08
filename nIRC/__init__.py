@@ -12,9 +12,9 @@
 # Docs: http://nekomimi.tilde.team/docs/nIRC.html
 #
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "NekoMimi"
 __author_email__ = "nekomimi@tilde.team"
 __license__ = "2025 (C) Nekocense <https://nekomimi.tilde.team/license/nekocense.txt>"
 
-from nIRC.irc import Bot, IRCConnection, Logger, Context, Member, Channel
+from nIRC.irc import Bot, IRCConnection, Logger, Context, Member, Channel, DCCFile
