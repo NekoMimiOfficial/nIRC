@@ -12,7 +12,7 @@
 # Docs: http://nekomimi.tilde.team/docs/nIRC.html
 #
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "NekoMimi"
 __author_email__ = "nekomimi@tilde.team"
 __license__ = "2025 (C) Nekocense <https://nekomimi.tilde.team/license/nekocense.txt>"

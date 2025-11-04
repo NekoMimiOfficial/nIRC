@@ -3,6 +3,7 @@ from datetime import datetime
 from functools import wraps
 import asyncio, re, sys, os
 import struct
+import importlib
 
 class LogLevel:
     """
@@ -21,7 +22,8 @@ LOG_PREFIX = {
     "CORE": "[CORE]",
     "USER": "[USER]",
     "COMMAND": "[COMMAND]",
-    "DCC": "[DCC]"
+    "DCC": "[DCC]",
+    "COG": "[COG]"
 }
 
 LOG_NET_ATTEMPT = "Attempting connection to {host}:{port}..."
@@ -60,6 +62,18 @@ LOG_DCC_TRANSFER_LOOP_ERROR = "An unexpected error occurred during the transfer 
 LOG_DCC_IP_CONVERT_ERROR = "ERROR converting IP: {ip_long} - {error}"
 LOG_DCC_EVENT_DISPATCH = "Dispatching 'on_dcc' event for {safe_filename}..."
 LOG_DOWNLOADS_DIR_INIT = "Created downloads directory: {dirname}."
+LOG_CORE_COG_LOAD = "Loading cog: {cog_name}..."
+LOG_CORE_COG_LOAD_SUCCESS = "Successfully loaded cog: {cog_name}"
+LOG_CORE_COG_LOAD_FAIL = "Failed to load cog '{cog_name}': {error}"
+LOG_CORE_COG_ALREADY_LOADED = "Cog '{cog_name}' is already loaded."
+LOG_CORE_COG_UNLOAD = "Unloading cog: {cog_name}..."
+LOG_CORE_COG_UNLOAD_SUCCESS = "Successfully unloaded cog: {cog_name}"
+LOG_CORE_COG_UNLOAD_FAIL = "Error during unload of cog '{cog_name}': {error}"
+LOG_CORE_COG_NOT_LOADED = "Cog '{cog_name}' is not loaded."
+LOG_CORE_COG_RELOAD = "Reloading cog: {cog_name}..."
+LOG_CORE_COG_RELOAD_SUCCESS = "Successfully reloaded cog: {cog_name}"
+LOG_CORE_COG_RELOAD_FAIL = "Failed to reload cog '{cog_name}': {error}"
+LOG_CORE_COG_RELOAD_AS_LOAD = "Cog '{cog_name}' not loaded. Loading instead."
 
 
 class Logger:
@@ -180,6 +194,7 @@ _event_registry: Dict[str, List[Callable]] = {
     'on_leave': [],
     'on_raw': [],
     'on_ready': [],
+    'on_nick': [],
     'on_dcc' : []
 }
 _task_registry: Dict[str, Callable] = {}
@@ -211,7 +226,7 @@ class IRCConnection:
     Handles the asynchronous socket connection, reading, writing, and buffering
     of raw IRC data using Python's asyncio streams.
     """
-    def __init__(self, host: str, port: int, logger: Optional[Logger] = None):
+    def __init__(self, host: str, port: int, logger: Optional[Logger] = None, quit_msg: Optional[str] = None):
         """
         Initializes the connection handler.
         @arg host: The IRC server hostname or IP address.
@@ -221,6 +236,7 @@ class IRCConnection:
         """
         self.host = host
         self.port = port
+        self.quit_msg = "QUIT :"+ quit_msg if quit_msg else "QUIT"
         self.reader: Optional[asyncio.StreamReader] = None
         self.writer: Optional[asyncio.StreamWriter] = None
         self.connected = False
@@ -290,12 +306,13 @@ class IRCConnection:
             self.connected = False
             return None
 
-    def close(self):
+    async def close(self):
         """
         Closes the network connection writer.
         @return: None
         """
         if self.writer:
+            await self.send_raw(self.quit_msg)
             self.writer.close()
             self.logger.info("NET", LOG_NET_CLOSED_LOCAL)
             self.connected = False
@@ -383,6 +400,13 @@ class Channel:
         """
         self.bot = bot
         self.name = name
+    
+    async def oper(self):
+        """
+        Requests OPER for the current channel
+        @return: None
+        """
+        await self.bot.send_raw(f"MODE {self.name} +o {self.bot.nick}")
 
     async def get_topic(self) -> str:
         """
@@ -628,6 +652,8 @@ class Bot:
         self.event_handlers: Dict[str, List[Callable]] = _event_registry.copy()
         self.task_registry: Dict[str, Callable] = _task_registry.copy()
 
+        self.cogs: Dict[str, Dict[str, Any]] = {}
+
     @staticmethod
     def command(name: str):
         """
@@ -723,6 +749,19 @@ class Bot:
         return decorator
 
     @staticmethod
+    def on_nick():
+        """
+        Decorator to register a function to be called when a user changes nicknames.
+        The decorated function must accept one argument: a Context object.
+        The context object will use the old Nick for the username and the new Nick in the text.
+        @return: The decorator function.
+        """
+        def decorator(func: Callable):
+            _event_registry['on_nick'].append(func)
+            return func
+        return decorator
+
+    @staticmethod
     def on_raw():
         """
         Decorator to register a function to be called for every single raw line received from the server.
@@ -766,6 +805,15 @@ class Bot:
             return func
         return decorator
 
+    async def oper(self, username: str, password: str):
+        """
+        Requests OPER on a server
+        @arg username: OPER username
+        @arg password: OPER password
+        @return: None
+        """
+        await self.send_raw(f"OPER {username} {password}")
+
     async def send_message(self, target: str, message: str):
         """
         Sends a PRIVMSG to a target (channel or user).
@@ -790,6 +838,198 @@ class Bot:
         @return: A Member object.
         """
         return Member(self, nick)
+
+    def load_cog(self, cog_name: str):
+        """
+        Loads a cog module.
+        A cog is a Python module (e.g., 'cogs.mycommands') that uses the
+        standard @Bot.command, @Bot.on_message, etc., decorators.
+        @arg cog_name: The dot-path name of the module to load.
+        @return: [int, Any], depending on whether it succeeded or failed to load
+            0, True:        loaded successfully.
+            1, False:       cogs already loaded.
+            2, Exception:   general error, check logs.
+        """
+        if cog_name in self.cogs:
+            self.logger.error("COG", LOG_CORE_COG_ALREADY_LOADED, cog_name=cog_name)
+            return [1, False]
+
+        self.logger.info("COG", LOG_CORE_COG_LOAD, cog_name=cog_name)
+        before_cmds = set(_command_registry.keys())
+        before_prefix = set(_prefix_command_registry.keys())
+        before_tasks = set(_task_registry.keys())
+        before_events = {key: list(handlers) for key, handlers in _event_registry.items()}
+
+        try:
+            module = importlib.import_module(cog_name)
+            after_cmds = set(_command_registry.keys())
+            new_cmds = after_cmds - before_cmds
+            for cmd in new_cmds:
+                self.commands[cmd] = _command_registry[cmd]
+            after_prefix = set(_prefix_command_registry.keys())
+            new_prefix = after_prefix - before_prefix
+            for prefix in new_prefix:
+                self.prefix_commands[prefix] = _prefix_command_registry[prefix]
+            after_tasks = set(_task_registry.keys())
+            new_tasks = after_tasks - before_tasks
+            for task in new_tasks:
+                self.task_registry[task] = _task_registry[task]
+            new_events_map: Dict[str, List[Callable]] = {}
+            for event_name, after_handlers in _event_registry.items():
+                before_handler_set = set(before_events.get(event_name, []))
+                added_handlers = [h for h in after_handlers if h not in before_handler_set]
+
+                if added_handlers:
+                    new_events_map[event_name] = added_handlers
+                    if event_name not in self.event_handlers:
+                        self.event_handlers[event_name] = []
+                    self.event_handlers[event_name].extend(added_handlers)
+
+            self.cogs[cog_name] = {
+                'module': module,
+                'commands': new_cmds,
+                'prefix_commands': new_prefix,
+                'tasks': new_tasks,
+                'events': new_events_map
+            }
+            self.logger.info("COG", LOG_CORE_COG_LOAD_SUCCESS, cog_name=cog_name)
+            return [0, True]
+
+        except Exception as e:
+            self.logger.error("ERROR", LOG_CORE_COG_LOAD_FAIL, cog_name=cog_name, error=e)
+            if cog_name in sys.modules:
+                del sys.modules[cog_name]
+            return [2, e]
+
+    def unload_cog(self, cog_name: str):
+        """
+        Unloads a cog module.
+        Removes all commands, event handlers, and tasks registered by that cog.
+        @arg cog_name: The dot-path name of the module to unload.
+        @return: [int, Any], depending on whether it succeeded or failed to load
+            0, True:        unloaded successfully.
+            1, False:       cogs already unloaded.
+            2, Exception:   general error, check logs.
+        """
+        if cog_name not in self.cogs:
+            self.logger.error("COG", LOG_CORE_COG_NOT_LOADED, cog_name=cog_name)
+            return [1, False]
+
+        self.logger.info("COG", LOG_CORE_COG_UNLOAD, cog_name=cog_name)
+        cog_data = self.cogs.pop(cog_name)
+
+        try:
+            for cmd in cog_data['commands']:
+                self.commands.pop(cmd, None)
+                _command_registry.pop(cmd, None)
+
+            for prefix in cog_data['prefix_commands']:
+                self.prefix_commands.pop(prefix, None)
+                _prefix_command_registry.pop(prefix, None)
+
+            for task in cog_data['tasks']:
+                self.task_registry.pop(task, None)
+                _task_registry.pop(task, None)
+
+            for event_name, handlers_to_remove in cog_data['events'].items():
+                for handler in handlers_to_remove:
+                    if event_name in self.event_handlers and handler in self.event_handlers[event_name]:
+                        self.event_handlers[event_name].remove(handler)
+                    if event_name in _event_registry and handler in _event_registry[event_name]:
+                        _event_registry[event_name].remove(handler)
+
+            if cog_name in sys.modules:
+                del sys.modules[cog_name]
+
+            self.logger.info("COG", LOG_CORE_COG_UNLOAD_SUCCESS, cog_name=cog_name)
+            return [0, True]
+
+        except Exception as e:
+            self.logger.error("ERROR", LOG_CORE_COG_UNLOAD_FAIL, cog_name=cog_name, error=e)
+            return [2, e]
+
+    def reload_cog(self, cog_name: str):
+        """
+        Reloads a cog module.
+        This is an unload followed by a load, but uses importlib.reload.
+        @arg cog_name: The dot-path name of the module to reload.
+        @return: [int, Any], depending on whether it succeeded or failed to load
+            0, True:        loaded successfully.
+            1, False:       cogs already loaded.
+            2, Exception:   general error, check logs.
+        """
+        if cog_name not in self.cogs:
+            self.logger.info("COG", LOG_CORE_COG_RELOAD_AS_LOAD, cog_name=cog_name)
+            self.load_cog(cog_name)
+            return [1, False]
+
+        self.logger.info("COG", LOG_CORE_COG_RELOAD, cog_name=cog_name)
+        cog_data = self.cogs.pop(cog_name)
+
+        try:
+            for cmd in cog_data['commands']:
+                self.commands.pop(cmd, None)
+                _command_registry.pop(cmd, None)
+
+            for prefix in cog_data['prefix_commands']:
+                self.prefix_commands.pop(prefix, None)
+                _prefix_command_registry.pop(prefix, None)
+
+            for task in cog_data['tasks']:
+                self.task_registry.pop(task, None)
+                _task_registry.pop(task, None)
+
+            for event_name, handlers_to_remove in cog_data['events'].items():
+                for handler in handlers_to_remove:
+                    if event_name in self.event_handlers and handler in self.event_handlers[event_name]:
+                        self.event_handlers[event_name].remove(handler)
+                    if event_name in _event_registry and handler in _event_registry[event_name]:
+                        _event_registry[event_name].remove(handler)
+
+            before_cmds = set(_command_registry.keys())
+            before_prefix = set(_prefix_command_registry.keys())
+            before_tasks = set(_task_registry.keys())
+            before_events = {key: list(handlers) for key, handlers in _event_registry.items()}
+
+            module = importlib.reload(cog_data['module'])
+            after_cmds = set(_command_registry.keys())
+            new_cmds = after_cmds - before_cmds
+            for cmd in new_cmds:
+                self.commands[cmd] = _command_registry[cmd]
+
+            after_prefix = set(_prefix_command_registry.keys())
+            new_prefix = after_prefix - before_prefix
+            for prefix in new_prefix:
+                self.prefix_commands[prefix] = _prefix_command_registry[prefix]
+
+            after_tasks = set(_task_registry.keys())
+            new_tasks = after_tasks - before_tasks
+            for task in new_tasks:
+                self.task_registry[task] = _task_registry[task]
+
+            new_events_map: Dict[str, List[Callable]] = {}
+            for event_name, after_handlers in _event_registry.items():
+                before_handler_set = set(before_events.get(event_name, []))
+                added_handlers = [h for h in after_handlers if h not in before_handler_set]
+                if added_handlers:
+                    new_events_map[event_name] = added_handlers
+                    if event_name not in self.event_handlers:
+                        self.event_handlers[event_name] = []
+                    self.event_handlers[event_name].extend(added_handlers)
+
+            self.cogs[cog_name] = {
+                'module': module,
+                'commands': new_cmds,
+                'prefix_commands': new_prefix,
+                'tasks': new_tasks,
+                'events': new_events_map
+            }
+            self.logger.info("COG", LOG_CORE_COG_RELOAD_SUCCESS, cog_name=cog_name)
+            return [0, True]
+
+        except Exception as e:
+            self.logger.error("ERROR", LOG_CORE_COG_RELOAD_FAIL, cog_name=cog_name, error=e)
+            return [2, e]
 
     async def _run_task(self, task_func: Callable, args: tuple):
         task_name = task_func.__name__
@@ -847,13 +1087,11 @@ class Bot:
 
 
     async def _dispatch_line(self, line: str):
-        logger = self.conn.logger
-
         raw_ctx = Context(self, "", "", line, "RAW", line)
         for handler in self.event_handlers['on_raw']:
             await handler(raw_ctx)
 
-        prefix, command, target, author_nick, message = self._parse_line(line)
+        _, command, target, author_nick, message = self._parse_line(line)
 
         if await self._handle_protocol(command, message):
             return
@@ -873,8 +1111,9 @@ class Bot:
             elif command == "JOIN" and author_nick != self.nick:
                 for handler in self.event_handlers['on_join']: await handler(ctx)
             elif command in ["PART", "QUIT"] and author_nick != self.nick:
-                # Dispatch on_leave for both PART and QUIT
                 for handler in self.event_handlers['on_leave']: await handler(ctx)
+            elif command == "NICK" and author_nick != self.nick:
+                for handler in self.event_handlers['on_nick']: await handler(ctx)
 
     async def _dispatch_message(self, ctx: Context):
         logger = self.conn.logger
@@ -1007,4 +1246,4 @@ class Bot:
 
         self.running = False
         logger.info("CORE", LOG_LOOP_ENDED)
-        self.conn.close()
+        await self.conn.close()

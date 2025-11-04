@@ -1,0 +1,6 @@
+- Bot.oper(username, password)  
+- Channel.oper()  
+- Bot.on_nick() @  
+- Bot.load_cog(cog_name)  
+- Bot.reload_cog(cog_name)  
+- Bot.unload_cog(cog_name)  
