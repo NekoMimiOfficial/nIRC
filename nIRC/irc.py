@@ -883,7 +883,8 @@ class Bot:
                     new_events_map[event_name] = added_handlers
                     if event_name not in self.event_handlers:
                         self.event_handlers[event_name] = []
-                    self.event_handlers[event_name].extend(added_handlers)
+                    for added_handlers_items in added_handlers:
+                        self.event_handlers[event_name].append(added_handlers_items)
 
             self.cogs[cog_name] = {
                 'module': module,
@@ -892,6 +893,16 @@ class Bot:
                 'tasks': new_tasks,
                 'events': new_events_map
             }
+
+            for e_name, handlers in self.event_handlers.items():
+                self.event_handlers[e_name]= []
+            for e_name, handlers in before_events.items():
+                for handler in handlers:
+                    self.event_handlers[e_name].append(handler)
+            for e_name, handlers in self.cogs[cog_name]["events"].items():
+                for handler in handlers:
+                    self.event_handlers[e_name].append(handler)
+
             self.logger.info("COG", LOG_CORE_COG_LOAD_SUCCESS, cog_name=cog_name)
             return [0, True]
 
