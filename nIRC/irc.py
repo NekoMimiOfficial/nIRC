@@ -899,7 +899,7 @@ class Bot:
             for e_name, handlers in before_events.items():
                 for handler in handlers:
                     self.event_handlers[e_name].append(handler)
-            for e_name, handlers in self.cogs[cog_name]["events"].items():
+            for e_name, handlers in new_events_map.items():
                 for handler in handlers:
                     self.event_handlers[e_name].append(handler)
 
@@ -951,6 +951,17 @@ class Bot:
 
             if cog_name in sys.modules:
                 del sys.modules[cog_name]
+
+            cogs_copy= self.cogs.copy()
+            self.cogs.clear()
+            for cog_name_l, cog_dispatches in cogs_copy.items():
+                if not cog_name_l == cog_name:
+                    self.cogs[cog_name_l]= cog_dispatches
+            for e_name, _ in _event_registry.items():
+                if e_name in self.event_handlers:
+                    _event_registry[e_name]= self.event_handlers[e_name]
+                else:
+                    _event_registry[e_name]= []
 
             self.logger.info("COG", LOG_CORE_COG_UNLOAD_SUCCESS, cog_name=cog_name)
             return [0, True]
