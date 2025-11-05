@@ -413,10 +413,12 @@ class Channel:
         Requests the current topic of the channel from the server.
         Note: The actual topic retrieval is complex and requires waiting for a 332 numeric.
         This is a placeholder that sends the request and returns an empty string immediately.
-        @return: The current topic of the channel (placeholder returns empty string).
+        @return: The current topic of the channel or an empty string in case of failure.
         """
         await self.bot.conn.send_raw(f"TOPIC {self.name}")
-        # In a real async bot, this would use an Event/Future to wait for the 332 numeric
+        topic_line= await self.bot.conn.read_line() or ""
+        if self.bot.nick in topic_line and self.name in topic_line:
+            return topic_line.split(":", 2)[2]
         return ""
 
     async def set_topic(self, new_topic: str):
