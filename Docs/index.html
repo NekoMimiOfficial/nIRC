@@ -253,7 +253,11 @@
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">start(channel_map)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Establishes the connection, performs initial setup, and enters the main event loop.</td></tr>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send_message(...)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a raw PRIVMSG to a specified channel or user.</td></tr>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">send_raw(message)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Sends a raw IRC protocol command directly to the server.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">start_task(task_func, *args)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Starts a background task defined with <code>@bot.task</code>.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">start_task(task_func, *args)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Starts a background task defined with <code>@bot.task</code>.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">load_cog(cog_name)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Dynamically loads commands and event handlers and tasks from a separate file.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">unload_cog(cog_name)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Unloads a loaded Cog while removing the Cog commands from the registry.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">reload_cog(cog_name)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Hot reloads a Cog's contents.</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">oper(username, password)</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Sets OPER mode for the bot on the entire IRC server.</td></tr>
                              </tbody>
                         </table>
                     </div>
@@ -276,6 +280,7 @@
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_join()</td><td class="p-4 text-sm">User joins channel</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds a function to the JOIN IRC event.</td></tr>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_leave()</td><td class="p-4 text-sm">User parts or quits</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds a function to the PART or QUIT IRC event.</td></tr>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_dcc()</td><td class="p-4 text-sm">DCC File Transfer</td><td class="p-4 font-mono text-sm"><code>DCCFile</code> instance</td><td class="p-4 text-sm text-ctp-subtext0">Fires when the bot receives a DCC SEND request and initiates the file transfer process.</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">@bot.on_nick()</td><td class="p-4 text-sm">Nick change</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Fires after each user NICK change.</td></tr>
                                 <tr><td class="p-4 font-mono text-sm">@bot.prefix_command(prefix)</td><td class="p-4 text-sm">Prefixless Command</td><td class="p-4 font-mono text-sm"><code>Context</code></td><td class="p-4 text-sm text-ctp-subtext0">Binds to a message starting with <code>prefix</code> (e.g., <code>&gt;</code>).</td></tr>
                              </tbody>
                         </table>
@@ -588,7 +593,8 @@
                              <tbody>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">get_topic()</td><td class="p-4 font-mono text-sm">method (str)</td><td class="p-4 text-sm text-ctp-subtext0">Returns the current topic of the channel.</td></tr>
                                 <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">set_topic(new_topic)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Sets a new topic for the channel.</td></tr>
-                                <tr><td class="p-4 font-mono text-sm">unban(user_mask)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Removes a ban by <code>user_mask</code> (e.g., <code>*!*@host</code>).</td></tr>
+                                <tr class="border-b border-ctp-surface2"><td class="p-4 font-mono text-sm">unban(user_mask)</td><td class="p-4 font-mono text-sm">method</td><td class="p-4 text-sm text-ctp-subtext0">Removes a ban by <code>user_mask</code> (e.g., <code>*!*@host</code>).</td></tr>
+                                <tr><td class="p-4 font-mono text-sm">oper()</td><td class="p-4 font-mono text-sm">async method</td><td class="p-4 text-sm text-ctp-subtext0">Becomes an OPER on the current channel, the bot has to have permission to do so, usually via <code>Bot.oper()</code>.</td></tr>
                              </tbody>
                         </table>
                     </div>
@@ -623,9 +629,9 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
                         <pre class="p-6 text-ctp-text overflow-x-auto"><code id="python-example-code" class="language-python">
-from nIRC.irc import Bot, Context, IRCConnection, Logger, DCCFile
+from nIRC.irc import Bot, Context, IRCConnection, Logger
 from typing import Optional
-import asyncio, time
+import asyncio
 
 BOT_NICK = "nIRC"
 COMMAND_PREFIX = "!"
@@ -637,12 +643,220 @@ SERVER = "127.0.0.1"
 PORT = 6667
 SERVER_PASSWORD: Optional[str] = None
 
+@Bot.command("load")
+async def load_cmd(ctx: Context):
+    if not ctx.arg:
+        await ctx.reply("Usage: !load <cog_name>")
+        return
+
+    cog_name = ctx.arg
+    try:
+        res= ctx.bot.load_cog(cog_name)
+        if res[0]== 0:
+            await ctx.reply(f"Cog '{cog_name}' loaded successfully.")
+        elif res[0]== 1:
+            await ctx.reply(f"Cog '{cog_name}' is already loaded.")
+        else:
+            await ctx.reply(f"Error loading Cog:")
+            for line in str(res[1]).splitlines():
+                await ctx.send(line)
+    except Exception as e:
+        await ctx.reply(f"Error loading cog '{cog_name}': {e}")
+
+@Bot.command("unload")
+async def unload_cmd(ctx: Context):
+    if not ctx.arg:
+        await ctx.reply("Usage: !unload <cog_name>")
+        return
+
+    cog_name = ctx.arg
+    try:
+        res= ctx.bot.unload_cog(cog_name)
+        if res[0]== 0:
+            await ctx.reply(f"Cog '{cog_name}' unloaded successfully.")
+        elif res[0]== 1:
+            await ctx.reply(f"Cog '{cog_name}' is not loaded.")
+        else:
+            await ctx.reply(f"Error unloading Cog:")
+            for line in str(res[1]).splitlines():
+                await ctx.send(line)
+    except Exception as e:
+        await ctx.reply(f"Error unloading cog '{cog_name}': {e}")
+
+@Bot.command("reload")
+async def reload_cmd(ctx: Context):
+    if not ctx.arg:
+        await ctx.reply("Usage: !reload <cog_name>")
+        return
+
+    cog_name = ctx.arg
+    try:
+        res= ctx.bot.reload_cog(cog_name)
+        if res[0]== 0:
+            await ctx.reply(f"Cog '{cog_name}' reloaded successfully.")
+        elif res[0]== 1:
+            await ctx.reply(f"Cog '{cog_name}' is not loaded.")
+        else:
+            await ctx.reply(f"Error reloading Cog:")
+            for line in str(res[1]).splitlines():
+                await ctx.send(line)
+    except Exception as e:
+        await ctx.reply(f"Error reloading cog '{cog_name}': {e}")
+
+@Bot.on_ready()
+async def initialization_setup(bot: Bot):
+    """
+    Runs once after connection and IRC registration is complete (after 376).
+    Starts tasks and can perform one-time setup actions.
+    """
+
+    if "#chat" in bot.channel_map:
+        await bot.conn.send_raw(f"MODE #chat +m") # Set +m (moderated) on #chat as an example one-time setup.
+
+    # You can load cogs on startup here, try using the following:
+    # bot.load_cog("cogs.test")
+
+
+async def run_bot():
+    """Main entry point to initialize and run the bot."""
+
+    global logger
+    logger= Logger(file_path= "log.txt", min_level= 0)
+
+    irc_connection = IRCConnection(SERVER, PORT, logger)
+
+    bot = Bot(
+        prefix=COMMAND_PREFIX,
+        conn=irc_connection,
+        nick=BOT_NICK,
+        username="nirc_bot",
+        realname="neko IRC bot framework example client",
+        password=SERVER_PASSWORD
+    )
+
+    try:
+        await bot.start(CHANNELS_TO_JOIN) #type: ignore
+    except Exception as e:
+        print(f"FATAL BOT ERROR: {e}")
+
+if __name__ == "__main__":
+    print("--- Starting Live Asynchronous nIRC Bot Framework Example ---")
+    print(f"Connecting as NICK: {BOT_NICK} to {SERVER}:{PORT}")
+    print(f"Channels configured: {', '.join(CHANNELS_TO_JOIN.keys())}")
+
+    try:
+        asyncio.run(run_bot())
+    except KeyboardInterrupt:
+        print("\n[BOT] Shutting down gracefully via Ctrl+C.")
+    except RuntimeError as e:
+        if "cannot run" in str(e):
+            print("\n[ERROR] Event loop error. If running in an interactive session, this is normal.")
+        else:
+            raise
+
+</code></pre></div><br><br>
+                    <h2 class="text-2xl font-bold text-ctp-text">Example Cog Script</h2>
+                    <p class="mt-4 text-ctp-subtext0">This script demonstrates Cog integration.</p>
+                    <p class="mt-4 text-ctp-subtext0">As per convention, Cogs are placed in a "cogs" folder and loaded by issuing <code>Bot.load_cog("cogs.cog_filename_without_ext")</code>.</p>
+                    <div class="mt-6 bg-ctp-surface0 rounded-lg text-sm code-block">
+                        <button class="copy-btn" title="Copy to clipboard" id="copy-button-cog">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                        </button>
+                        <pre class="p-6 text-ctp-text overflow-x-auto"><code id="python-example-code-cog" class="language-python">
+from nIRC.irc import Bot, Context, DCCFile, Member
+
+
+@Bot.command("hello")
+async def hello_from_cog(ctx: Context):
+    """A simple command loaded from a cog."""
+
+    await ctx.reply(f"Hello {ctx.author}! This command was loaded from test.py.")
+
+@Bot.task(interval=60.0, max_repeat=5)
+async def cog_task(bot_instance: Bot):
+    """A recurring task loaded from a cog."""
+
+    current = getattr(cog_task, 'current_repeat', 0)
+    total = getattr(cog_task, 'max_repeat', 0)
+
+    bot_instance.logger.info("TASK", f"[COG] Cog task is running! Repeat {current}/{total}")
+    for channel in bot_instance.channel_map:
+        await bot_instance.send_message(channel, f"Cog task reporting in! (Run {current}/{total})")
+
+@Bot.command("tasker")
+async def cog_task_runner(ctx: Context):
+    """Runs an nIRC bot task specifically one that requires no args"""
+
+    task_name= ctx.arg
+    if not ctx.arg:
+        await ctx.reply("Usage: !tasker <task_name>")
+        return
+
+    try:
+        func= ctx.bot.task_registry[task_name]
+        ctx.bot.start_task(func)
+        await ctx.reply(f"Running task: {task_name}")
+    except Exception as e:
+        await ctx.reply(f"Failed to run task: {e}")
+
+@Bot.command("rmcmd")
+async def cog_rm_cmd(ctx: Context):
+    """Removes a command from the runnable commands"""
+
+    if not ctx.arg:
+        await ctx.reply("Usage: !rmcmd <command_name>")
+        return
+
+    removed= False
+    cmd_name= ctx.arg
+    old_reg= ctx.bot.commands.copy()
+    ctx.bot.commands.clear()
+    for cmd, func in old_reg.items():
+        if not cmd == cmd_name:
+            ctx.bot.commands[cmd]= func # Note: this will most likely break on a cog unload due to the main _event_registry remaining intact
+        else:
+            removed= True
+
+    if removed:
+        await ctx.reply(f"Removed command: '{cmd_name}'.")
+    else:
+        await ctx.reply(f"Commands '{cmd_name}' not found.")
+
+@Bot.command("commands")
+async def loaded_commands(ctx: Context):
+    """Shows what commands you have loaded"""
+
+    coms= ""
+    pcoms= ""
+    events= ""
+    tasks= ""
+
+    for com in ctx.bot.commands:
+        coms+= str(com)+ " "
+
+    for pcom in ctx.bot.prefix_commands:
+        pcoms+= str(pcom)+ " "
+
+    for event in ctx.bot.event_handlers:
+        events+= str(event)+ f"({len(ctx.bot.event_handlers[event])}) "
+
+    for task in ctx.bot.task_registry:
+        tasks+= str(task)+ " "
+
+    await ctx.send("===Registered Events=======================================")
+    await ctx.send(f"Commands: {coms}")
+    await ctx.send(f"Prefix Commands: {pcoms}")
+    await ctx.send(f"Events: {events}")
+    await ctx.send(f"Tasks: {tasks}")
+    await ctx.send("===========================================================")
+
 @Bot.prefix_command(">")
 async def ai_query_command(ctx: Context):
     """
     Fires on any message starting with '>' (e.g., >what is my status).
     This is great for clean, non-standard bot interactions.
     """
+
     if ctx.arg:
         response = f"AI Service received query from {ctx.author}: '{ctx.arg}'. Processing..."
         await ctx.reply(response)
@@ -657,6 +871,7 @@ async def calculate_command(ctx: Context):
     Demonstrates using ctx.arg and ctx.args.
     A simplified math evaluator.
     """
+
     if not ctx.arg:
         await ctx.reply("Usage: !calc <expression> (e.g., 5 + 3 * 2)")
         return
@@ -675,6 +890,7 @@ async def mod_command(ctx: Context):
     Handles moderation actions using Member and Channel abstractions.
     Usage: !mod <action> <target> [reason/value]
     """
+
     if len(ctx.args) < 2:
         await ctx.reply("Usage: !mod <kick|ban|topic|unban> <target> [value]")
         return
@@ -707,6 +923,7 @@ async def mod_command(ctx: Context):
 @Bot.command("pmuser")
 async def pm_user_command(ctx: Context):
     """Sends a private message to a specified user."""
+
     if len(ctx.args) < 2:
         await ctx.reply("Usage: !pmuser <nick> <message...>")
         return
@@ -714,103 +931,49 @@ async def pm_user_command(ctx: Context):
     recipient_nick = ctx.args[0]
     message_text = " ".join(ctx.args[1:])
 
-    await ctx._bot.send_message(recipient_nick, f"PM from {ctx.author}: {message_text}")
+    await ctx.bot.send_message(recipient_nick, f"PM from {ctx.author}: {message_text}")
     await ctx.reply(f"PM sent to {recipient_nick}.")
 
 @Bot.on_message()
 async def keyword_responder(ctx: Context):
     """Responds to specific keywords in a channel message."""
+
     message = ctx.message.lower()
-    if "nirc status" in message.lower():
-        await ctx.reply(f"I am nIRC exampleBot, running on {SERVER}. My command prefix is '{COMMAND_PREFIX}'.")
-    elif "help" == message.strip().lower():
-        await ctx.reply(f"Available commands: !calc, !mod, !pmuser. See console for raw logs (type ERROR).")
+    if message.strip() == ctx.bot.nick.lower():
+        await ctx.reply(f"My command prefix is '{ctx.bot.prefix}'.")
+        coms= ""
+        for com in ctx.bot.commands:
+            coms+= ctx.bot.prefix+ str(com)+ " "
+        await ctx.send(f"Available commands: {coms}")
 
 @Bot.on_join()
 async def greet_joiner(ctx: Context):
     """Sends a friendly greeting when a new user joins."""
-    if ctx.author != BOT_NICK:
-        await ctx.reply(f"Welcome, {ctx.author}! Type '{COMMAND_PREFIX}calc 1+1' to test a command.")
+
+    if ctx.author != ctx.bot.nick:
+        await ctx.reply(f"Welcome, {ctx.author}! Type {ctx.bot.prefix}commands to get a list of commands and events.")
 
 @Bot.on_raw()
 async def raw_logger(ctx: Context):
     """Logs the raw line to the console (for demonstration only, triggers on all lines)."""
+
     if "ERROR" in ctx.full_line or "NOTICE" in ctx.full_line:
         print(f"[RAW LOG] IMPORTANT LINE: {ctx.full_line}")
 
-@Bot.task(interval=10, max_repeat=5)
-async def status_announcement(bot_instance: Bot, channel_name: str):
-    """
-    A non-blocking task that posts a system status message to the #logs channel.
-    Shows the power of context-free scheduled actions.
-    """
-    count = status_announcement.current_repeat
+@Bot.prefix_command("?")
+async def cog_prefix_cmd(ctx: Context):
+    """A prefix command loaded from a cog."""
 
-    await bot_instance.send_message(
-        channel_name,
-        f"[HEARTBEAT] Task iteration {count}/5. Time: {time.strftime('%H:%M:%S')}. (Interval: 10s)"
-    )
+    await ctx.reply(f"Cog prefix command '?' triggered with: {ctx.arg}")
 
 @Bot.on_dcc()
 async def get_file(file: DCCFile):
-    logger.info("USER", f"Accepting file '{file.filename}' from {file.sender}.")
+    """DCC handler for receiving files over DCC"""
+
+    file.context.logger.info("USER", f"Accepting file '{file.filename}' from {file.sender}.")
+    user = Member(file.context.bot, file.sender)
+    await user.send("Thanks for the file, it's *definitely* safe :3")
     await file.start_transfer()
-
-@Bot.on_ready()
-async def initialization_setup(bot: Bot):
-    """
-    Runs once after connection and IRC registration is complete (after 376).
-    Starts tasks and can perform one-time setup actions.
-    """
-    print("[NET] Running specialized initialization setup.")
-
-    if "#logs" in bot.channel_map:
-        bot.start_task(status_announcement, "#logs")
-    else:
-        print("[WARN] #logs channel not configured. Heartbeat task skipped.")
-
-    if "#chat" in bot.channel_map:
-        await bot.conn.send_raw(f"MODE #chat +m")
-        print("[NET] Set +m (moderated) on #chat as an example one-time setup.")
-
-
-async def run_bot():
-    """Main entry point to initialize and run the bot."""
-    global logger
-    logger= Logger(file_path= "log.txt", min_level= 0)
-
-    irc_connection = IRCConnection(SERVER, PORT, logger)
-
-    bot = Bot(
-        prefix=COMMAND_PREFIX,
-        conn=irc_connection,
-        nick=BOT_NICK,
-        username="nirc_bot",
-        realname="neko IRC bot framework example client",
-        password=SERVER_PASSWORD
-    )
-
-    try:
-        await bot.start(CHANNELS_TO_JOIN)
-    except Exception as e:
-        print(f"FATAL BOT ERROR: {e}")
-    finally:
-        irc_connection.close()
-
-if __name__ == "__main__":
-    print("--- Starting Live Asynchronous nIRC Bot Framework Example ---")
-    print(f"Connecting as NICK: {BOT_NICK} to {SERVER}:{PORT}")
-    print(f"Channels configured: {', '.join(CHANNELS_TO_JOIN.keys())}")
-
-    try:
-        asyncio.run(run_bot())
-    except KeyboardInterrupt:
-        print("\n[BOT] Shutting down gracefully via Ctrl+C.")
-    except RuntimeError as e:
-        if "cannot run" in str(e):
-            print("\n[ERROR] Event loop error. If running in an interactive session, this is normal.")
-        else:
-            raise
 
 </code></pre>
                     </div>
@@ -825,6 +988,8 @@ if __name__ == "__main__":
             const sections = document.querySelectorAll('main section');
             const codeBlockElement = document.getElementById('python-example-code');
             const copyButton = document.getElementById('copy-button');
+            const codeBlockElementCog = document.getElementById('python-example-code-cog');
+            const copyButtonCog = document.getElementById('copy-button-cog');
 
             copyButton.addEventListener('click', () => {
                 const rawCodeText = codeBlockElement.textContent;
@@ -838,6 +1003,24 @@ if __name__ == "__main__":
                     copyButton.innerHTML = 'Copied!';
                     setTimeout(() => {
                        copyButton.innerHTML = originalContent;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            });
+
+            copyButtonCog.addEventListener('click', () => {
+                const rawCodeText = codeBlockElementCog.textContent;
+
+                const codeToCopy = rawCodeText
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>');
+
+                navigator.clipboard.writeText(codeToCopy.trim()).then(() => {
+                    const originalContent = copyButtonCig.innerHTML;
+                    copyButtonCog.innerHTML = 'Copied!';
+                    setTimeout(() => {
+                       copyButtonCog.innerHTML = originalContent;
                     }, 2000);
                 }).catch(err => {
                     console.error('Failed to copy text: ', err);
