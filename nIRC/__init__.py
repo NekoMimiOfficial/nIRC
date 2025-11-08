@@ -16,5 +16,3 @@ __version__ = "1.0.3"
 __author__ = "NekoMimi"
 __author_email__ = "nekomimi@tilde.team"
 __license__ = "2025 (C) Nekocense <https://nekomimi.tilde.team/license/nekocense.txt>"
-
-from nIRC.irc import Bot, IRCConnection, Logger, Context, Member, Channel, DCCFile

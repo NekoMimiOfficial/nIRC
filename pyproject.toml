@@ -12,9 +12,10 @@ authors = [
 description = "an asynchronous IRC bot framework"
 readme = "README.md"
 requires-python = ">=3.8"
+license = "LicenseRef-Nekocense-1.0"
+license-files = ["LICENSE"]
 classifiers = [
 "Programming Language :: Python :: 3",
-"License :: OSI Approved :: MIT License",
 "Operating System :: OS Independent",
 "Topic :: Utilities",
 ]

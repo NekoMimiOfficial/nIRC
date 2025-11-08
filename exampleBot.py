@@ -1,4 +1,7 @@
-from nIRC.irc import Bot, Context, IRCConnection, Logger
+from nIRC.irc import Bot, IRCConnection
+from nIRC.logger import Logger
+from nIRC.types.channel import Channel
+from nIRC.types.context import Context
 from typing import Optional
 import asyncio
 
@@ -12,66 +15,6 @@ SERVER = "127.0.0.1"
 PORT = 6667
 SERVER_PASSWORD: Optional[str] = None
 
-@Bot.command("load")
-async def load_cmd(ctx: Context):
-    if not ctx.arg:
-        await ctx.reply("Usage: !load <cog_name>")
-        return
-
-    cog_name = ctx.arg
-    try:
-        res= ctx.bot.load_cog(cog_name)
-        if res[0]== 0:
-            await ctx.reply(f"Cog '{cog_name}' loaded successfully.")
-        elif res[0]== 1:
-            await ctx.reply(f"Cog '{cog_name}' is already loaded.")
-        else:
-            await ctx.reply(f"Error loading Cog:")
-            for line in str(res[1]).splitlines():
-                await ctx.send(line)
-    except Exception as e:
-        await ctx.reply(f"Error loading cog '{cog_name}': {e}")
-
-@Bot.command("unload")
-async def unload_cmd(ctx: Context):
-    if not ctx.arg:
-        await ctx.reply("Usage: !unload <cog_name>")
-        return
-
-    cog_name = ctx.arg
-    try:
-        res= ctx.bot.unload_cog(cog_name)
-        if res[0]== 0:
-            await ctx.reply(f"Cog '{cog_name}' unloaded successfully.")
-        elif res[0]== 1:
-            await ctx.reply(f"Cog '{cog_name}' is not loaded.")
-        else:
-            await ctx.reply(f"Error unloading Cog:")
-            for line in str(res[1]).splitlines():
-                await ctx.send(line)
-    except Exception as e:
-        await ctx.reply(f"Error unloading cog '{cog_name}': {e}")
-
-@Bot.command("reload")
-async def reload_cmd(ctx: Context):
-    if not ctx.arg:
-        await ctx.reply("Usage: !reload <cog_name>")
-        return
-
-    cog_name = ctx.arg
-    try:
-        res= ctx.bot.reload_cog(cog_name)
-        if res[0]== 0:
-            await ctx.reply(f"Cog '{cog_name}' reloaded successfully.")
-        elif res[0]== 1:
-            await ctx.reply(f"Cog '{cog_name}' is not loaded.")
-        else:
-            await ctx.reply(f"Error reloading Cog:")
-            for line in str(res[1]).splitlines():
-                await ctx.send(line)
-    except Exception as e:
-        await ctx.reply(f"Error reloading cog '{cog_name}': {e}")
-
 @Bot.on_ready()
 async def initialization_setup(bot: Bot):
     """
@@ -79,11 +22,14 @@ async def initialization_setup(bot: Bot):
     Starts tasks and can perform one-time setup actions.
     """
 
+    await bot.oper("NICKOPER", "nickoppass") # Become OPER on the SERVER
+
     if "#chat" in bot.channel_map:
+        await Channel(bot, "#chat").oper() # Become OPER on the chat channel
         await bot.conn.send_raw(f"MODE #chat +m") # Set +m (moderated) on #chat as an example one-time setup.
 
     # You can load cogs on startup here, try using the following:
-    # bot.load_cog("cogs.test")
+    bot.load_cog("exampleCogs.showcase")
 
 
 async def run_bot():
@@ -92,7 +38,7 @@ async def run_bot():
     global logger
     logger= Logger(file_path= "log.txt", min_level= 0)
 
-    irc_connection = IRCConnection(SERVER, PORT, logger)
+    irc_connection = IRCConnection(SERVER, PORT, logger, quit_msg= "nIRC is shutting down...")
 
     bot = Bot(
         prefix=COMMAND_PREFIX,
